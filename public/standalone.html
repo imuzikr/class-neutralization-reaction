@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>산-염기 중화반응 시뮬레이터 | 고등학교 화학 학습</title>
+    <meta name="description" content="고등학생을 위한 인터랙티브 산-염기 중화반응 시뮬레이터. HCl과 NaOH의 반응을 시각화하고 BTB 지시약의 색 변화를 실시간으로 관찰하세요." />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+        .beaker-markings {
+            position: absolute;
+            right: -30px;
+            top: 10%;
+            bottom: 10%;
+            width: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        .beaker-markings span::before {
+            content: '—';
+            margin-right: 4px;
+        }
+        .ion {
+            transition: all 0.5s ease-in-out;
+        }
+        .ion.is-hidden {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+        @keyframes fall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(60px) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(120px) scale(0.8);
+            }
+        }
+        .drop-animate {
+            animation: fall 0.8s ease-in forwards;
+        }
+        #drop {
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+        #drop.visible {
+            opacity: 1;
+        }
+        .chart-container {
+            position: relative;
+            height: 240px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-100 via-orange-100 to-yellow-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-7xl mx-auto bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-3xl shadow-2xl p-6 md:p-8 border-2 border-amber-200">
+        <header class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-3">
+                <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                </svg>
+                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    산-염기 중화 반응 시뮬레이터
+                </h1>
+            </div>
+            <p class="text-gray-600 text-sm md:text-base max-w-3xl mx-auto">
+                묽은 염산(HCl)에 수산화 나트륨(NaOH)을 첨가하며 BTB 용액의 색 변화를 관찰해 봅시다.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <!-- Left Section -->
+            <div class="flex flex-col gap-8">
+                <!-- Simulation Area -->
+                <div class="glass-panel p-6 rounded-xl">
+                    <div class="flex justify-center items-end gap-12 md:gap-20 w-full h-[280px] mb-6">
+                        <!-- Apparatus Container -->
+                        <div class="relative w-40 h-full">
+                            <!-- 뷰렛 -->
+                            <div id="burette" class="absolute top-0 left-1/2 -translate-x-1/2 w-10 flex flex-col items-center z-10" style="height: 80px;">
+                                <div class="w-5 h-full bg-gradient-to-b from-gray-200 to-gray-300 border-x-2 border-t-2 border-gray-400 rounded-t-sm relative shadow-inner">
+                                    <div id="burette-solution" class="absolute bottom-0 w-full bg-gradient-to-b from-sky-400 to-sky-500 transition-all duration-300 rounded-t-sm" style="height: 100%;"></div>
+                                </div>
+                                <div class="w-12 h-3 bg-gradient-to-b from-gray-500 to-gray-600 rounded-sm my-1 shadow-md"></div>
+                                <div class="w-px h-2 bg-gray-500"></div>
+                                <div id="drop" class="w-2 h-2 bg-sky-400 rounded-full absolute bottom-[-10px] shadow-lg"></div>
+                            </div>
+                            <!-- 비커 -->
+                            <div id="beaker" class="absolute bottom-0 left-0 w-40 h-48 bg-gradient-to-b from-gray-100/40 to-gray-200/40 border-b-4 border-x-4 border-gray-400 rounded-b-3xl flex items-end shadow-xl">
+                                <div id="solution" class="w-full transition-all duration-500 ease-in-out rounded-b-2xl relative" style="height: 40%;">
+                                    <div id="ions-display" class="absolute inset-0 flex flex-wrap items-center justify-center p-2 gap-1 overflow-hidden"></div>
+                                </div>
+                                <div class="beaker-markings">
+                                    <span>100</span>
+                                    <span>50</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Buttons Container -->
+                        <div class="flex flex-col gap-3 pb-4">
+                            <button id="add-btn" class="w-44 h-12 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 rounded-lg">
+                                NaOH 10mL 첨가
+                            </button>
+                            <button id="reset-btn" class="w-44 h-12 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105 rounded-lg flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                초기화
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Volume Display -->
+                    <div class="text-center bg-gradient-to-r from-amber-100 to-orange-100 p-4 rounded-xl border-2 border-amber-300">
+                        <span class="text-sm font-semibold text-gray-700">첨가한 NaOH 부피:</span>
+                        <span id="volume-display" class="font-bold text-3xl text-amber-600 ml-2">0</span>
+                        <span class="text-gray-600 ml-1">mL</span>
+                    </div>
+                </div>
+
+                <!-- State Info -->
+                <div class="glass-panel p-6 rounded-xl">
+                    <h2 class="text-xl font-bold mb-4 text-amber-600 border-b-2 border-amber-200 pb-2">
+                        현재 용액 상태
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-white/50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-600 mb-1">용액의 액성</p>
+                            <p id="acidity-display" class="text-lg font-bold text-gray-800">산성</p>
+                        </div>
+                        <div class="bg-white/50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-600 mb-1">BTB 용액 색</p>
+                            <div class="flex items-center gap-2">
+                                <div id="color-indicator" class="w-6 h-6 rounded-full border-2 border-gray-400 shadow-lg"></div>
+                                <p id="color-display" class="text-lg font-bold text-gray-800">노란색</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="text-sm font-semibold text-gray-600 mb-2">
+                            용액 속 이온 수 (상대값)
+                        </h3>
+                        <div id="all-ions-display" class="grid grid-cols-2 gap-x-6 gap-y-2 bg-white/50 p-3 rounded-lg">
+                            <!-- 이온 정보가 여기에 동적으로 표시됩니다 -->
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                            <h3 class="text-sm font-semibold text-emerald-700 mb-1">알짜 이온</h3>
+                            <p class="text-sm font-mono text-emerald-900">H⁺, OH⁻</p>
+                        </div>
+                        <div class="bg-gray-100 p-3 rounded-lg border border-gray-300">
+                            <h3 class="text-sm font-semibold text-gray-600 mb-1">구경꾼 이온</h3>
+                            <p class="text-sm font-mono text-gray-700">Na⁺, Cl⁻</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                        <p id="explanation" class="text-sm text-gray-700 leading-relaxed">초기 묽은 염산은 H⁺ 이온 때문에 산성을 띠며, BTB 용액은 노란색입니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Section - Charts -->
+            <div class="flex flex-col gap-6">
+                <!-- Ion Chart -->
+                <div class="glass-panel p-6 rounded-xl">
+                    <h2 class="text-xl font-bold mb-4 text-amber-600 border-b-2 border-amber-200 pb-2">
+                        이온 수 변화 그래프
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="ion-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Temperature Chart -->
+                <div class="glass-panel p-6 rounded-xl">
+                    <h2 class="text-xl font-bold mb-4 text-amber-600 border-b-2 border-amber-200 pb-2">
+                        온도 변화 그래프
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="temp-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM 요소 가져오기
+        const solution = document.getElementById('solution');
+        const volumeDisplay = document.getElementById('volume-display');
+        const addBtn = document.getElementById('add-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const acidityDisplay = document.getElementById('acidity-display');
+        const colorIndicator = document.getElementById('color-indicator');
+        const colorDisplay = document.getElementById('color-display');
+        const allIonsDisplay = document.getElementById('all-ions-display');
+        const explanation = document.getElementById('explanation');
+        const ionsDisplay = document.getElementById('ions-display');
+        const drop = document.getElementById('drop');
+        const buretteSolution = document.getElementById('burette-solution');
+
+        // 상수 정의
+        const CONSTANTS = {
+            INITIAL_HCL_VOLUME: 100,
+            INITIAL_HCL_CONCENTRATION: 0.1,
+            NAOH_CONCENTRATION: 0.1,
+            VOLUME_INCREMENT: 10,
+            MAX_NAOH_VOLUME: 200,
+            NUM_IONS_TO_DISPLAY: 10,
+            INITIAL_HCL_MOLES: 0.01
+        };
+
+        // 상태 변수
+        let addedNaohVolume = 0;
+        let tempChart, ionChart;
+
+        // 색상 상태 정의
+        const stateColors = {
+            acid: { 
+                indicator: 'bg-yellow-400', 
+                solution: 'bg-yellow-400/30', 
+                text: '노란색' 
+            },
+            neutral: { 
+                indicator: 'bg-green-400', 
+                solution: 'bg-green-400/30', 
+                text: '초록색' 
+            },
+            base: { 
+                indicator: 'bg-blue-400', 
+                solution: 'bg-blue-400/30', 
+                text: '파란색' 
+            },
+        };
+
+        // 이온 초기화
+        function setupIons() {
+            ionsDisplay.innerHTML = '';
+            const createIonElement = (text, bgColorClass, typeClass) => {
+                const ion = document.createElement('div');
+                ion.className = `ion ${typeClass} w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg ${bgColorClass} transform`;
+                ion.textContent = text;
+                return ion;
+            };
+
+            for (let i = 0; i < CONSTANTS.NUM_IONS_TO_DISPLAY; i++) {
+                ionsDisplay.appendChild(createIonElement('H⁺', 'bg-yellow-500', 'h-ion'));
+            }
+            for (let i = 0; i < CONSTANTS.NUM_IONS_TO_DISPLAY; i++) {
+                ionsDisplay.appendChild(createIonElement('OH⁻', 'bg-blue-500', 'oh-ion'));
+            }
+            for (let i = 0; i < CONSTANTS.NUM_IONS_TO_DISPLAY; i++) {
+                ionsDisplay.appendChild(createIonElement('Na⁺', 'bg-gray-500', 'na-ion'));
+            }
+            for (let i = 0; i < CONSTANTS.NUM_IONS_TO_DISPLAY; i++) {
+                ionsDisplay.appendChild(createIonElement('Cl⁻', 'bg-gray-400', 'cl-ion'));
+            }
+        }
+        
+        // 이온 렌더링
+        function renderIons(hCount, ohCount, naCount, clCount) {
+            const hIons = ionsDisplay.querySelectorAll('.h-ion');
+            const ohIons = ionsDisplay.querySelectorAll('.oh-ion');
+            const naIons = ionsDisplay.querySelectorAll('.na-ion');
+            const clIons = ionsDisplay.querySelectorAll('.cl-ion');
+
+            hIons.forEach((ion, index) => {
+                ion.classList.toggle('is-hidden', index >= hCount);
+            });
+
+            ohIons.forEach((ion, index) => {
+                ion.classList.toggle('is-hidden', index >= ohCount);
+            });
+
+            naIons.forEach((ion, index) => {
+                ion.classList.toggle('is-hidden', index >= naCount);
+            });
+
+            clIons.forEach((ion, index) => {
+                ion.classList.toggle('is-hidden', index >= clCount);
+            });
+        }
+
+        // 이온 계산
+        function calculateIonCounts() {
+            const naohMolesAdded = (addedNaohVolume / 1000) * CONSTANTS.NAOH_CONCENTRATION;
+            let hMoles = CONSTANTS.INITIAL_HCL_MOLES - naohMolesAdded;
+            let ohMoles = naohMolesAdded - CONSTANTS.INITIAL_HCL_MOLES;
+            
+            const hCount = Math.max(0, Math.round((hMoles / CONSTANTS.INITIAL_HCL_MOLES) * CONSTANTS.NUM_IONS_TO_DISPLAY));
+            const ohCount = Math.max(0, Math.min(CONSTANTS.NUM_IONS_TO_DISPLAY, Math.round((ohMoles / CONSTANTS.INITIAL_HCL_MOLES) * CONSTANTS.NUM_IONS_TO_DISPLAY)));
+            const naCount = Math.round((naohMolesAdded / CONSTANTS.INITIAL_HCL_MOLES) * CONSTANTS.NUM_IONS_TO_DISPLAY);
+            const clCount = CONSTANTS.NUM_IONS_TO_DISPLAY;
+
+            return { h: hCount, oh: ohCount, na: naCount, cl: clCount };
+        }
+
+        // 용액 상태 계산
+        function calculateSolutionState() {
+            const ionCounts = calculateIonCounts();
+            
+            if (ionCounts.h > 0) return 'acid';
+            if (ionCounts.oh > 0) return 'base';
+            return 'neutral';
+        }
+
+        // 온도 계산
+        function calculateTemperature() {
+            const START_TEMP = 20;
+            const PEAK_TEMP = 30;
+            const END_TEMP = 25;
+            const NEUTRALIZATION_POINT_VOLUME = 100;
+
+            if (addedNaohVolume <= NEUTRALIZATION_POINT_VOLUME) {
+                const tempRise = (PEAK_TEMP - START_TEMP) * (addedNaohVolume / NEUTRALIZATION_POINT_VOLUME);
+                return START_TEMP + tempRise;
+            } else {
+                const volumeAfterNeutral = addedNaohVolume - NEUTRALIZATION_POINT_VOLUME;
+                const maxVolumeAfterNeutral = CONSTANTS.MAX_NAOH_VOLUME - NEUTRALIZATION_POINT_VOLUME;
+                const tempDrop = (PEAK_TEMP - END_TEMP) * (volumeAfterNeutral / maxVolumeAfterNeutral);
+                return PEAK_TEMP - tempDrop;
+            }
+        }
+
+        // 설명 텍스트 생성
+        function getExplanation(state) {
+            if (addedNaohVolume === 0) {
+                return '초기 묽은 염산은 H⁺ 이온 때문에 산성을 띠며, BTB 용액은 노란색입니다.';
+            }
+            
+            const explanations = {
+                acid: '아직 H⁺ 이온이 남아있어 산성을 띱니다. H⁺와 OH⁻가 반응하여 물(H₂O)이 생성되고 열이 발생합니다.',
+                neutral: '중화점에 도달했습니다! H⁺와 OH⁻ 이온이 모두 반응하여 온도가 가장 높습니다.',
+                base: '이제 OH⁻ 이온이 남아있어 용액이 염기성을 띱니다. 더 이상 반응열이 발생하지 않아 온도가 내려갑니다.'
+            };
+            
+            return explanations[state];
+        }
+
+        // 액성 텍스트
+        function getAcidityText(state) {
+            const texts = {
+                acid: '산성',
+                neutral: '중성',
+                base: '염기성'
+            };
+            return texts[state];
+        }
+
+        // UI 업데이트
+        function updateUI() {
+            volumeDisplay.textContent = addedNaohVolume;
+            
+            // 용액 부피 증가
+            const beakerFillHeight = 40 + (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 40;
+            solution.style.height = `${Math.min(85, beakerFillHeight)}%`;
+
+            // 상태 계산
+            const state = calculateSolutionState();
+            const ionCounts = calculateIonCounts();
+            const currentColors = stateColors[state];
+
+            // 상태 표시
+            acidityDisplay.textContent = getAcidityText(state);
+            colorIndicator.className = `w-6 h-6 rounded-full border-2 border-gray-400 shadow-lg ${currentColors.indicator}`;
+            colorDisplay.textContent = currentColors.text;
+            explanation.textContent = getExplanation(state);
+            solution.className = `w-full transition-all duration-500 ease-in-out rounded-b-2xl relative ${currentColors.solution}`;
+            
+            // 이온 렌더링
+            renderIons(ionCounts.h, ionCounts.oh, ionCounts.na, ionCounts.cl);
+            
+            // 이온 수 업데이트
+            allIonsDisplay.innerHTML = `
+                <div class="flex justify-between font-mono text-sm">
+                    <span class="text-gray-600">H⁺:</span> 
+                    <span class="font-bold text-yellow-600">${ionCounts.h}</span>
+                </div>
+                <div class="flex justify-between font-mono text-sm">
+                    <span class="text-gray-600">OH⁻:</span> 
+                    <span class="font-bold text-blue-600">${ionCounts.oh}</span>
+                </div>
+                <div class="flex justify-between font-mono text-sm">
+                    <span class="text-gray-600">Cl⁻:</span> 
+                    <span class="font-bold text-gray-500">${ionCounts.cl}</span>
+                </div>
+                <div class="flex justify-between font-mono text-sm">
+                    <span class="text-gray-600">Na⁺:</span> 
+                    <span class="font-bold text-gray-500">${ionCounts.na}</span>
+                </div>
+            `;
+        }
+
+        // 그래프 업데이트
+        function updateCharts() {
+            if (addedNaohVolume > 0) {
+                const currentTemp = calculateTemperature();
+                tempChart.data.datasets[0].data.push({ x: addedNaohVolume, y: currentTemp });
+                tempChart.update('none');
+
+                const ionCounts = calculateIonCounts();
+                ionChart.data.datasets[0].data.push({ x: addedNaohVolume, y: ionCounts.h });
+                ionChart.data.datasets[1].data.push({ x: addedNaohVolume, y: ionCounts.oh });
+                ionChart.data.datasets[2].data.push({ x: addedNaohVolume, y: ionCounts.na });
+                ionChart.data.datasets[3].data.push({ x: addedNaohVolume, y: ionCounts.cl });
+                ionChart.update('none');
+            }
+        }
+
+        // 물방울 애니메이션
+        function showDropAnimation() {
+            return new Promise((resolve) => {
+                drop.classList.add('visible');
+                drop.classList.remove('drop-animate');
+                void drop.offsetWidth;
+                drop.classList.add('drop-animate');
+
+                setTimeout(() => {
+                    drop.classList.remove('visible', 'drop-animate');
+                    resolve();
+                }, 800);
+            });
+        }
+
+        // NaOH 추가
+        async function handleAdd() {
+            if (addBtn.disabled || addedNaohVolume >= CONSTANTS.MAX_NAOH_VOLUME) return;
+
+            addBtn.disabled = true;
+            
+            const newHeight = 100 - ((addedNaohVolume + CONSTANTS.VOLUME_INCREMENT) / CONSTANTS.MAX_NAOH_VOLUME) * 100;
+            buretteSolution.style.height = `${Math.max(0, newHeight)}%`;
+
+            await showDropAnimation();
+
+            addedNaohVolume += CONSTANTS.VOLUME_INCREMENT;
+            updateUI();
+            updateCharts();
+
+            addBtn.disabled = false;
+        }
+
+        // 초기화
+        function handleReset() {
+            addedNaohVolume = 0;
+            buretteSolution.style.height = '100%';
+            
+            drop.classList.remove('visible', 'drop-animate');
+            addBtn.disabled = false;
+
+            tempChart.data.datasets[0].data = [];
+            ionChart.data.datasets.forEach(dataset => { dataset.data = []; });
+            
+            tempChart.update('none');
+            ionChart.update('none');
+            
+            updateUI();
+        }
+
+        // 온도 그래프 초기화
+        function initializeTempChart() {
+            const ctx = document.getElementById('temp-chart').getContext('2d');
+            tempChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{ 
+                        label: '온도', 
+                        data: [], 
+                        borderColor: '#f97316', 
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)', 
+                        borderWidth: 3, 
+                        tension: 0.4,
+                        pointBackgroundColor: '#fb923c',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: {
+                        x: { 
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: '첨가한 NaOH 부피 (mL)', 
+                                color: '#78350f',
+                                font: { size: 13, weight: 'bold' }
+                            }, 
+                            ticks: { color: '#92400e' }, 
+                            grid: { color: 'rgba(251, 191, 36, 0.15)' }, 
+                            min: 0,
+                            max: CONSTANTS.MAX_NAOH_VOLUME 
+                        },
+                        y: { 
+                            title: { 
+                                display: true, 
+                                text: '온도 (°C)', 
+                                color: '#78350f',
+                                font: { size: 13, weight: 'bold' }
+                            }, 
+                            min: 18, 
+                            max: 32, 
+                            ticks: { color: '#92400e', stepSize: 2 }, 
+                            grid: { color: 'rgba(251, 191, 36, 0.15)' } 
+                        }
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: { 
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#d97706',
+                            bodyColor: '#374151',
+                            borderColor: '#f59e0b',
+                            borderWidth: 2,
+                            padding: 12,
+                            callbacks: { 
+                                label: (context) => `온도: ${context.parsed.y.toFixed(2)} °C` 
+                            } 
+                        } 
+                    }
+                }
+            });
+        }
+        
+        // 이온 그래프 초기화
+        function initializeIonChart() {
+            const ctx = document.getElementById('ion-chart').getContext('2d');
+            ionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        { 
+                            label: 'H⁺', 
+                            data: [], 
+                            borderColor: '#eab308', 
+                            backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                            borderWidth: 3, 
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#fbbf24',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        { 
+                            label: 'OH⁻', 
+                            data: [], 
+                            borderColor: '#3b82f6', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 3, 
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#60a5fa',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        { 
+                            label: 'Na⁺', 
+                            data: [], 
+                            borderColor: '#6b7280', 
+                            backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                            borderWidth: 3, 
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            pointBackgroundColor: '#9ca3af',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        { 
+                            label: 'Cl⁻', 
+                            data: [], 
+                            borderColor: '#a1a1aa', 
+                            backgroundColor: 'rgba(161, 161, 170, 0.05)',
+                            borderWidth: 2, 
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            borderDash: [5, 5],
+                            pointBackgroundColor: '#d4d4d8',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: {
+                        x: { 
+                            type: 'linear',
+                            title: { 
+                                display: true, 
+                                text: '첨가한 NaOH 부피 (mL)', 
+                                color: '#78350f',
+                                font: { size: 13, weight: 'bold' }
+                            }, 
+                            ticks: { color: '#92400e' }, 
+                            grid: { color: 'rgba(251, 191, 36, 0.15)' }, 
+                            min: 0,
+                            max: CONSTANTS.MAX_NAOH_VOLUME 
+                        },
+                        y: { 
+                            title: { 
+                                display: true, 
+                                text: '이온 수 (상대값)', 
+                                color: '#78350f',
+                                font: { size: 13, weight: 'bold' }
+                            }, 
+                            min: 0, 
+                            max: 20, 
+                            ticks: { color: '#92400e', stepSize: 2 }, 
+                            grid: { color: 'rgba(251, 191, 36, 0.15)' } 
+                        }
+                    },
+                    plugins: { 
+                        legend: { 
+                            position: 'top',
+                            labels: { 
+                                color: '#78350f',
+                                font: { size: 12, weight: 'bold' },
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        },
+                        tooltip: { 
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            bodyColor: '#374151',
+                            borderColor: '#d1d5db',
+                            borderWidth: 2,
+                            padding: 12
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 이벤트 리스너 연결
+        addBtn.addEventListener('click', handleAdd);
+        resetBtn.addEventListener('click', handleReset);
+
+        // 앱 시작
+        window.onload = () => {
+            setupIons();
+            initializeTempChart();
+            initializeIonChart();
+            updateUI();
+        };
+    </script>
+</body>
+</html>
