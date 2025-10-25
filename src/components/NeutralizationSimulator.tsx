@@ -160,7 +160,7 @@ export default function NeutralizationSimulator() {
         </div>
 
         {/* Right Section - Charts */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
             <h2 className="text-xl font-bold mb-4 text-primary border-b-2 border-primary/20 pb-2">
               이온 수 변화 그래프
