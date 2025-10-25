@@ -4,6 +4,7 @@ import Beaker from './Beaker';
 import StateInfo from './StateInfo';
 import TemperatureChart from './TemperatureChart';
 import IonChart from './IonChart';
+import NeutralizationQuiz from './NeutralizationQuiz';
 import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature } from '@/lib/neutralizationCalculations';
 import { ChartDataPoint } from '@/types/neutralization';
 import { FlaskConical, RotateCcw } from 'lucide-react';
@@ -59,6 +60,8 @@ export default function NeutralizationSimulator() {
     });
   };
 
+  const showQuiz = addedNaohVolume >= CONSTANTS.MAX_NAOH_VOLUME;
+
   return (
     <div className="w-full max-w-7xl mx-auto bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-3xl shadow-2xl p-6 md:p-8 border-2 border-amber-200">
       <header className="text-center mb-8">
@@ -73,11 +76,13 @@ export default function NeutralizationSimulator() {
         </p>
       </header>
 
+      <NeutralizationQuiz show={showQuiz} />
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Left Section */}
         <div className="flex flex-col gap-8">
           {/* Simulation Area */}
-          <div className="glass-panel p-6 rounded-xl">
+          <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
             <div className="flex justify-center items-end gap-12 md:gap-20 w-full h-[280px] mb-6">
               <Beaker 
                 addedNaohVolume={addedNaohVolume} 
@@ -105,7 +110,7 @@ export default function NeutralizationSimulator() {
             </div>
 
             {/* Volume Display */}
-            <div className="text-center bg-gradient-to-r from-amber-100 to-orange-100 p-4 rounded-xl border-2 border-amber-300">
+            <div className="text-center bg-gradient-to-r from-amber-100 to-orange-100 p-4 rounded-xl border-2 border-amber-300 mt-auto">
               <span className="text-sm font-semibold text-gray-700">첨가한 NaOH 부피:</span>
               <span className="font-bold text-3xl text-primary ml-2">{addedNaohVolume}</span>
               <span className="text-gray-600 ml-1">mL</span>
@@ -122,23 +127,27 @@ export default function NeutralizationSimulator() {
 
         {/* Right Section - Charts */}
         <div className="flex flex-col gap-6">
-          <div className="glass-panel p-6 rounded-xl">
+          <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
             <h2 className="text-xl font-bold mb-4 text-primary border-b-2 border-primary/20 pb-2">
               이온 수 변화 그래프
             </h2>
-            <IonChart 
-              hData={ionData.h}
-              ohData={ionData.oh}
-              naData={ionData.na}
-              clData={ionData.cl}
-            />
+            <div className="flex-1">
+              <IonChart 
+                hData={ionData.h}
+                ohData={ionData.oh}
+                naData={ionData.na}
+                clData={ionData.cl}
+              />
+            </div>
           </div>
 
-          <div className="glass-panel p-6 rounded-xl">
+          <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
             <h2 className="text-xl font-bold mb-4 text-primary border-b-2 border-primary/20 pb-2">
               온도 변화 그래프
             </h2>
-            <TemperatureChart data={tempData} />
+            <div className="flex-1">
+              <TemperatureChart data={tempData} />
+            </div>
           </div>
         </div>
       </div>

@@ -14,7 +14,7 @@ export default function StateInfo({ state, ionCounts, addedNaohVolume }: StateIn
   const explanation = getExplanation(state, addedNaohVolume);
 
   return (
-    <div className="glass-panel p-6 rounded-xl">
+    <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col overflow-y-auto">
       <h2 className="text-xl font-bold mb-4 text-primary border-b-2 border-primary/20 pb-2">
         현재 용액 상태
       </h2>
