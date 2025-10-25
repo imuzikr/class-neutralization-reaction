@@ -61,11 +61,11 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding }: 
         <div className="absolute right-[-25px] top-[10%] bottom-[10%] w-20 flex flex-col justify-between text-xs text-gray-500 font-medium">
           <div className="flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />
-            <span>100mL</span>
+            <span>200mL</span>
           </div>
           <div className="flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />
-            <span>50mL</span>
+            <span>100mL</span>
           </div>
         </div>
       </div>

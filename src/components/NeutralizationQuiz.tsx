@@ -29,8 +29,8 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
     const shuffled = [...withoutCorrect].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 4);
     
-    // 100 추가하고 섞기
-    const finalOptions = [...selected, correctAnswer].sort(() => Math.random() - 0.5);
+    // 100 추가하고 오름차순 정렬
+    const finalOptions = [...selected, correctAnswer].sort((a, b) => a - b);
     
     setOptions(finalOptions);
     setSelectedAnswer(null);
