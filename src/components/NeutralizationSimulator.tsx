@@ -50,8 +50,11 @@ export default function NeutralizationSimulator() {
   };
 
   const handleReset = () => {
-    setAddedNaohVolume(0);
+    // 진행 중인 작업 취소
     setIsAdding(false);
+    
+    // 상태 초기화
+    setAddedNaohVolume(0);
     setTempData([]);
     setIonData({
       h: [],

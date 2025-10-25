@@ -14,7 +14,8 @@ interface BeakerProps {
 
 export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, indicator }: BeakerProps) {
   const [dropVisible, setDropVisible] = useState(false);
-  const beakerFillHeight = 40 + (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 40;
+  // 시작: 50% (100mL), 종료: 100% (200mL)
+  const beakerFillHeight = 50 + (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 50;
   const buretteHeight = 100 - (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 100;
   const solutionColors = INDICATOR_COLORS[indicator][state];
 
@@ -51,7 +52,7 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
       <div className="absolute bottom-0 left-0 w-40 h-48 bg-gradient-to-b from-gray-200/30 to-gray-300/50 border-b-4 border-x-4 border-gray-400 rounded-b-3xl flex items-end shadow-xl">
         <div 
           className={`w-full transition-all duration-500 ease-in-out rounded-b-2xl relative ${solutionColors.solution}`}
-          style={{ height: `${Math.min(85, beakerFillHeight)}%` }}
+          style={{ height: `${Math.min(100, beakerFillHeight)}%` }}
         >
           <IonDisplay ionCounts={ionCounts} />
           {/* Liquid shine effect */}

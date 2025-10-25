@@ -10,7 +10,7 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
   const [options, setOptions] = useState<number[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const correctAnswer = 100;
+  const correctAnswer = 100; // 중화점: NaOH 100mL 추가 시
 
   useEffect(() => {
     if (show) {
@@ -19,8 +19,8 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
   }, [show]);
 
   const generateOptions = () => {
-    // 10의 배수인 선택지 생성 (0, 10, 20, ..., 200)
-    const possibleValues = Array.from({ length: 21 }, (_, i) => i * 10);
+    // 10의 배수인 선택지 생성 (0, 10, 20, ..., 100)
+    const possibleValues = Array.from({ length: 11 }, (_, i) => i * 10);
     
     // 100을 제외한 값들
     const withoutCorrect = possibleValues.filter(v => v !== correctAnswer);

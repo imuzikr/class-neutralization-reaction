@@ -5,7 +5,7 @@ export const CONSTANTS = {
   NAOH_CONCENTRATION: 0.1,
   VOLUME_INCREMENT: 10,
   INITIAL_TOTAL_VOLUME: 100,
-  MAX_NAOH_VOLUME: 200,
+  MAX_NAOH_VOLUME: 100,
   NUM_IONS_TO_DISPLAY: 10,
   TOLERANCE: 1e-9
 };
@@ -50,16 +50,13 @@ export function calculateTemperature(addedNaohVolume: number): number {
   const START_TEMP = 20;
   const PEAK_TEMP = 30;
   const END_TEMP = 25;
-  const NEUTRALIZATION_POINT_VOLUME = 100;
+  const NEUTRALIZATION_POINT_VOLUME = CONSTANTS.MAX_NAOH_VOLUME;
 
   if (addedNaohVolume <= NEUTRALIZATION_POINT_VOLUME) {
     const tempRise = (PEAK_TEMP - START_TEMP) * (addedNaohVolume / NEUTRALIZATION_POINT_VOLUME);
     return START_TEMP + tempRise;
   } else {
-    const volumeAfterNeutral = addedNaohVolume - NEUTRALIZATION_POINT_VOLUME;
-    const maxVolumeAfterNeutral = CONSTANTS.MAX_NAOH_VOLUME - NEUTRALIZATION_POINT_VOLUME;
-    const tempDrop = (PEAK_TEMP - END_TEMP) * (volumeAfterNeutral / maxVolumeAfterNeutral);
-    return PEAK_TEMP - tempDrop;
+    return PEAK_TEMP;
   }
 }
 
