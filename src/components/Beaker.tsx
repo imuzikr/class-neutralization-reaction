@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { STATE_COLORS, SolutionState } from '@/types/neutralization';
+import { INDICATOR_COLORS, SolutionState, IndicatorType } from '@/types/neutralization';
 import { IonCounts } from '@/types/neutralization';
 import { CONSTANTS } from '@/lib/neutralizationCalculations';
 import IonDisplay from './IonDisplay';
@@ -9,13 +9,14 @@ interface BeakerProps {
   state: SolutionState;
   ionCounts: IonCounts;
   isAdding: boolean;
+  indicator: IndicatorType;
 }
 
-export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding }: BeakerProps) {
+export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, indicator }: BeakerProps) {
   const [dropVisible, setDropVisible] = useState(false);
   const beakerFillHeight = 40 + (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 40;
   const buretteHeight = 100 - (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 100;
-  const solutionColors = STATE_COLORS[state];
+  const solutionColors = INDICATOR_COLORS[indicator][state];
 
   useEffect(() => {
     if (isAdding) {
@@ -58,12 +59,12 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding }: 
         </div>
         
         {/* Beaker markings */}
-        <div className="absolute right-[-25px] top-[10%] bottom-[10%] w-20 flex flex-col justify-between text-xs text-gray-500 font-medium">
-          <div className="flex items-center gap-1">
+        <div className="absolute right-[-25px] top-[10%] bottom-[10%] w-20 text-xs text-gray-500 font-medium">
+          <div className="absolute top-0 flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />
             <span>200mL</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="absolute top-1/2 -translate-y-1/2 flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />
             <span>100mL</span>
           </div>

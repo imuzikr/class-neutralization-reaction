@@ -6,12 +6,13 @@ import TemperatureChart from './TemperatureChart';
 import IonChart from './IonChart';
 import NeutralizationQuiz from './NeutralizationQuiz';
 import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature } from '@/lib/neutralizationCalculations';
-import { ChartDataPoint } from '@/types/neutralization';
+import { ChartDataPoint, IndicatorType } from '@/types/neutralization';
 import { FlaskConical, RotateCcw } from 'lucide-react';
 
 export default function NeutralizationSimulator() {
   const [addedNaohVolume, setAddedNaohVolume] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
+  const [indicator, setIndicator] = useState<IndicatorType>('btb');
   const [tempData, setTempData] = useState<ChartDataPoint[]>([]);
   const [ionData, setIonData] = useState({
     h: [] as ChartDataPoint[],
@@ -72,8 +73,29 @@ export default function NeutralizationSimulator() {
           </h1>
         </div>
         <p className="text-muted-foreground text-sm md:text-base max-w-3xl mx-auto">
-          묽은 염산(HCl)에 수산화 나트륨(NaOH)을 첨가하며 BTB 용액의 색 변화를 관찰해 봅시다.
+          묽은 염산(HCl)에 수산화 나트륨(NaOH)을 첨가하며 지시약의 색 변화를 관찰해 봅시다.
         </p>
+        
+        {/* Indicator Selection */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <span className="font-semibold text-gray-700">지시약 선택:</span>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setIndicator('btb')}
+              variant={indicator === 'btb' ? 'default' : 'outline'}
+              className={indicator === 'btb' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' : ''}
+            >
+              BTB 용액
+            </Button>
+            <Button
+              onClick={() => setIndicator('phenolphthalein')}
+              variant={indicator === 'phenolphthalein' ? 'default' : 'outline'}
+              className={indicator === 'phenolphthalein' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' : ''}
+            >
+              페놀프탈레인 용액
+            </Button>
+          </div>
+        </div>
       </header>
 
       <NeutralizationQuiz show={showQuiz} />
@@ -89,6 +111,7 @@ export default function NeutralizationSimulator() {
                 state={state} 
                 ionCounts={ionCounts}
                 isAdding={isAdding}
+                indicator={indicator}
               />
               <div className="flex flex-col gap-3 pb-4">
                 <Button
@@ -122,6 +145,7 @@ export default function NeutralizationSimulator() {
             state={state} 
             ionCounts={ionCounts} 
             addedNaohVolume={addedNaohVolume}
+            indicator={indicator}
           />
         </div>
 

@@ -1,4 +1,4 @@
-import { SolutionState, STATE_COLORS } from '@/types/neutralization';
+import { SolutionState, INDICATOR_COLORS, IndicatorType } from '@/types/neutralization';
 import { IonCounts } from '@/types/neutralization';
 import { getAcidityText, getExplanation } from '@/lib/neutralizationCalculations';
 
@@ -6,10 +6,12 @@ interface StateInfoProps {
   state: SolutionState;
   ionCounts: IonCounts;
   addedNaohVolume: number;
+  indicator: IndicatorType;
 }
 
-export default function StateInfo({ state, ionCounts, addedNaohVolume }: StateInfoProps) {
-  const stateColors = STATE_COLORS[state];
+export default function StateInfo({ state, ionCounts, addedNaohVolume, indicator }: StateInfoProps) {
+  const stateColors = INDICATOR_COLORS[indicator][state];
+  const indicatorName = indicator === 'btb' ? 'BTB 용액' : '페놀프탈레인 용액';
   const acidityText = getAcidityText(state);
   const explanation = getExplanation(state, addedNaohVolume);
 
@@ -25,7 +27,7 @@ export default function StateInfo({ state, ionCounts, addedNaohVolume }: StateIn
           <p className="text-lg font-bold text-foreground">{acidityText}</p>
         </div>
         <div className="bg-muted/50 p-3 rounded-lg">
-          <p className="text-sm text-muted-foreground mb-1">BTB 용액 색</p>
+          <p className="text-sm text-muted-foreground mb-1">{indicatorName} 색</p>
           <div className="flex items-center gap-2">
             <div className={`w-6 h-6 rounded-full border-2 border-gray-400 shadow-lg ${stateColors.indicator}`} />
             <p className="text-lg font-bold text-foreground">{stateColors.text}</p>
