@@ -136,10 +136,17 @@ export default function NeutralizationSimulator() {
             </div>
 
             {/* Volume Display */}
-            <div className="text-center bg-gradient-to-r from-amber-100 to-orange-100 p-4 rounded-xl border-2 border-amber-300 mt-auto">
-              <span className="text-sm font-semibold text-gray-700">첨가한 NaOH 부피:</span>
-              <span className="font-bold text-3xl text-primary ml-2">{addedNaohVolume}</span>
-              <span className="text-gray-600 ml-1">mL</span>
+            <div className="text-center bg-gradient-to-r from-amber-100 to-orange-100 p-4 rounded-xl border-2 border-amber-300 mt-auto space-y-2">
+              <div>
+                <span className="text-sm font-semibold text-gray-700">첨가한 NaOH 부피:</span>
+                <span className="font-bold text-3xl text-primary ml-2">{addedNaohVolume}</span>
+                <span className="text-gray-600 ml-1">mL</span>
+              </div>
+              <div>
+                <span className="text-sm font-semibold text-gray-700">총 용액 부피:</span>
+                <span className="font-bold text-2xl text-primary ml-2">{CONSTANTS.INITIAL_TOTAL_VOLUME + addedNaohVolume}</span>
+                <span className="text-gray-600 ml-1">mL</span>
+              </div>
             </div>
           </div>
 
