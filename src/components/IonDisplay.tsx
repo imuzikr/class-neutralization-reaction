@@ -41,7 +41,7 @@ export default function IonDisplay({ ionCounts }: IonDisplayProps) {
         <div
           key={`h-${i}`}
           data-type="h"
-          className="ion w-5 h-5 rounded-full flex items-center justify-center text-gray-900 font-bold text-xs shadow-lg ion-h transition-all duration-500 ease-in-out"
+          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-red-400 to-red-600 transition-all duration-500 ease-in-out opacity-0 scale-50"
         >
           H⁺
         </div>
@@ -51,7 +51,7 @@ export default function IonDisplay({ ionCounts }: IonDisplayProps) {
         <div
           key={`oh-${i}`}
           data-type="oh"
-          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg ion-oh transition-all duration-500 ease-in-out"
+          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-blue-400 to-blue-600 transition-all duration-500 ease-in-out opacity-0 scale-50"
         >
           OH⁻
         </div>
