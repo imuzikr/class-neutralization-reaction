@@ -12,16 +12,25 @@ export default function IonDisplay({ ionCounts }: IonDisplayProps) {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const ions = containerRef.current.querySelectorAll('.ion');
-    ions.forEach((ion, index) => {
-      const ionElement = ion as HTMLElement;
-      const ionType = ionElement.dataset.type;
-      
-      let shouldShow = false;
-      if (ionType === 'h' && index < ionCounts.h) shouldShow = true;
-      if (ionType === 'oh' && index < ionCounts.oh) shouldShow = true;
+    console.log('IonCounts:', ionCounts);
 
-      if (shouldShow) {
+    const hIons = containerRef.current.querySelectorAll('[data-type="h"]');
+    const ohIons = containerRef.current.querySelectorAll('[data-type="oh"]');
+    
+    hIons.forEach((ion, index) => {
+      const ionElement = ion as HTMLElement;
+      if (index < ionCounts.h) {
+        ionElement.style.opacity = '1';
+        ionElement.style.transform = 'scale(1)';
+      } else {
+        ionElement.style.opacity = '0';
+        ionElement.style.transform = 'scale(0.5)';
+      }
+    });
+
+    ohIons.forEach((ion, index) => {
+      const ionElement = ion as HTMLElement;
+      if (index < ionCounts.oh) {
         ionElement.style.opacity = '1';
         ionElement.style.transform = 'scale(1)';
       } else {
