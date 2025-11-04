@@ -90,7 +90,7 @@ export default function TemperatureChart({ data }: TemperatureChartProps) {
         borderColor: '#f97316',
         backgroundColor: 'rgba(249, 115, 22, 0.1)',
         borderWidth: 3,
-        tension: 0.4,
+        tension: 0,
         pointBackgroundColor: '#fb923c',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,

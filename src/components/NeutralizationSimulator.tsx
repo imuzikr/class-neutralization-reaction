@@ -13,12 +13,13 @@ export default function NeutralizationSimulator() {
   const [addedNaohVolume, setAddedNaohVolume] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [indicator, setIndicator] = useState<IndicatorType>('btb');
-  const [tempData, setTempData] = useState<ChartDataPoint[]>([]);
+  const [tempData, setTempData] = useState<ChartDataPoint[]>([{ x: 0, y: 20 }]);
+  const initialIonCounts = calculateIonCounts(0);
   const [ionData, setIonData] = useState({
-    h: [] as ChartDataPoint[],
-    oh: [] as ChartDataPoint[],
-    na: [] as ChartDataPoint[],
-    cl: [] as ChartDataPoint[],
+    h: [{ x: 0, y: initialIonCounts.h }] as ChartDataPoint[],
+    oh: [{ x: 0, y: initialIonCounts.oh }] as ChartDataPoint[],
+    na: [{ x: 0, y: initialIonCounts.na }] as ChartDataPoint[],
+    cl: [{ x: 0, y: initialIonCounts.cl }] as ChartDataPoint[],
   });
 
   const ionCounts = calculateIonCounts(addedNaohVolume);
@@ -55,12 +56,13 @@ export default function NeutralizationSimulator() {
     
     // 상태 초기화
     setAddedNaohVolume(0);
-    setTempData([]);
+    const initialIonCounts = calculateIonCounts(0);
+    setTempData([{ x: 0, y: 20 }]);
     setIonData({
-      h: [],
-      oh: [],
-      na: [],
-      cl: [],
+      h: [{ x: 0, y: initialIonCounts.h }],
+      oh: [{ x: 0, y: initialIonCounts.oh }],
+      na: [{ x: 0, y: initialIonCounts.na }],
+      cl: [{ x: 0, y: initialIonCounts.cl }],
     });
   };
 
