@@ -22,7 +22,7 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
   const solutionColors = INDICATOR_COLORS[indicator][state];
 
   useEffect(() => {
-    if (isAdding && addedNaohVolume > 0) {
+    if (isAdding) {
       setDropVisible(true);
       const timer = setTimeout(() => setDropVisible(false), 400);
       return () => clearTimeout(timer);
