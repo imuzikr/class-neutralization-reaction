@@ -24,7 +24,7 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
   useEffect(() => {
     if (isAdding) {
       setDropVisible(true);
-      const timer = setTimeout(() => setDropVisible(false), 800);
+      const timer = setTimeout(() => setDropVisible(false), 400);
       return () => clearTimeout(timer);
     }
   }, [isAdding]);
@@ -46,7 +46,7 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
           className={`w-5 h-5 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full absolute bottom-[-10px] shadow-lg transition-all duration-100 flex items-center justify-center text-white font-bold text-xs ${
             dropVisible ? 'animate-drop opacity-100' : 'opacity-0'
           }`}
-          style={{ animation: dropVisible ? 'dropFall 0.8s ease-in forwards' : 'none' }}
+          style={{ animation: dropVisible ? 'dropFall 0.4s ease-in forwards' : 'none' }}
         >
           OH⁻
         </div>

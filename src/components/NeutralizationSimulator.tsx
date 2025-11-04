@@ -30,7 +30,7 @@ export default function NeutralizationSimulator() {
 
     setIsAdding(true);
 
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 400));
 
     const newVolume = addedNaohVolume + CONSTANTS.VOLUME_INCREMENT;
     setAddedNaohVolume(newVolume);
