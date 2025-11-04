@@ -41,13 +41,15 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
         </div>
         <div className="w-12 h-3 bg-gradient-to-b from-gray-500 to-gray-600 rounded-sm my-1 shadow-md" />
         <div className="w-px h-2 bg-gray-500" />
-        {/* Drop */}
+        {/* Drop - OH- ion */}
         <div 
-          className={`w-2 h-2 bg-gradient-to-br from-sky-300 to-sky-500 rounded-full absolute bottom-[-10px] shadow-lg transition-all duration-100 ${
+          className={`w-5 h-5 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full absolute bottom-[-10px] shadow-lg transition-all duration-100 flex items-center justify-center text-white font-bold text-xs ${
             dropVisible ? 'animate-drop opacity-100' : 'opacity-0'
           }`}
           style={{ animation: dropVisible ? 'dropFall 0.8s ease-in forwards' : 'none' }}
-        />
+        >
+          OH⁻
+        </div>
       </div>
 
       {/* Beaker */}
