@@ -1,12 +1,12 @@
 import { SolutionState, IonCounts } from '@/types/neutralization';
 
 export const CONSTANTS = {
-  INITIAL_HCL_MOLES: 0.01,
+  INITIAL_HCL_MOLES: 0.005,
   NAOH_CONCENTRATION: 0.1,
   VOLUME_INCREMENT: 10,
-  INITIAL_TOTAL_VOLUME: 100,
-  MAX_NAOH_VOLUME: 200,
-  NEUTRALIZATION_POINT: 100,
+  INITIAL_TOTAL_VOLUME: 50,
+  MAX_NAOH_VOLUME: 100,
+  NEUTRALIZATION_POINT: 50,
   NUM_IONS_TO_DISPLAY: 10,
   TOLERANCE: 1e-9
 };
@@ -68,7 +68,7 @@ export function calculateTemperature(addedNaohVolume: number): number {
 
 export function getExplanation(state: SolutionState, addedNaohVolume: number): string {
   if (addedNaohVolume === 0) {
-    return '초기 묽은 염산은 H⁺ 이온 때문에 산성을 띠며, BTB 용액은 노란색입니다.';
+    return '초기 50mL의 묽은 염산은 H⁺ 이온 때문에 산성을 띠며, BTB 용액은 노란색입니다.';
   }
 
   switch (state) {

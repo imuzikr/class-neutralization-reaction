@@ -14,10 +14,10 @@ interface BeakerProps {
 
 export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, indicator }: BeakerProps) {
   const [dropVisible, setDropVisible] = useState(false);
-  // 총 부피 = 초기 HCl 100mL + 추가된 NaOH
-  // 비커 최대 300mL 기준: 100mL(33.33%), 200mL(66.67%), 300mL(100%)
+  // 총 부피 = 초기 HCl 50mL + 추가된 NaOH
+  // 비커 최대 150mL 기준: 50mL(33.33%), 100mL(66.67%), 150mL(100%)
   const totalVolume = CONSTANTS.INITIAL_TOTAL_VOLUME + addedNaohVolume;
-  const beakerFillHeight = (totalVolume / 300) * 100;
+  const beakerFillHeight = (totalVolume / 150) * 100;
   const buretteHeight = 100 - (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 100;
   const solutionColors = INDICATOR_COLORS[indicator][state];
 
@@ -63,19 +63,19 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
           <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent rounded-t-2xl" />
         </div>
         
-        {/* Beaker markings - 비커 높이 100% = 300mL 기준 */}
+        {/* Beaker markings - 비커 높이 100% = 150mL 기준 */}
         <div className="absolute right-[-25px] top-0 bottom-0 w-20 text-xs text-gray-500 font-medium">
           <div className="absolute top-0 flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />
-            <span>300mL</span>
+            <span>150mL</span>
           </div>
           <div className="absolute top-[33.33%] flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />
-            <span>200mL</span>
+            <span>100mL</span>
           </div>
           <div className="absolute top-[66.67%] flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />
-            <span>100mL</span>
+            <span>50mL</span>
           </div>
         </div>
       </div>
