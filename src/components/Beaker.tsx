@@ -27,7 +27,7 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
       const timer = setTimeout(() => setDropVisible(false), 400);
       return () => clearTimeout(timer);
     }
-  }, [isAdding, addedNaohVolume]);
+  }, [isAdding]);
 
   return (
     <div className="relative w-40 h-full">
