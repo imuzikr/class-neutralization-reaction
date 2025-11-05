@@ -25,7 +25,10 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
     if (isAdding) {
       setDropVisible(true);
       const timer = setTimeout(() => setDropVisible(false), 400);
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        setDropVisible(false);
+      };
     }
   }, [isAdding]);
 
