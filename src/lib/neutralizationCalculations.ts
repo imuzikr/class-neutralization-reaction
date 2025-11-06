@@ -35,8 +35,12 @@ export function calculateIonCounts(addedNaohVolume: number): IonCounts {
   const ohCount = Math.round(ohIonFactor * CONSTANTS.NUM_IONS_TO_DISPLAY);
   const clCount = CONSTANTS.NUM_IONS_TO_DISPLAY;
   const naCount = Math.round((naohMolesAdded / CONSTANTS.INITIAL_HCL_MOLES) * CONSTANTS.NUM_IONS_TO_DISPLAY);
+  
+  // 물 분자는 반응한 H+/OH- 수만큼 생성
+  const reactedMoles = Math.min(CONSTANTS.INITIAL_HCL_MOLES, naohMolesAdded);
+  const waterCount = Math.round((reactedMoles / CONSTANTS.INITIAL_HCL_MOLES) * CONSTANTS.NUM_IONS_TO_DISPLAY);
 
-  return { h: hCount, oh: ohCount, na: naCount, cl: clCount };
+  return { h: hCount, oh: ohCount, na: naCount, cl: clCount, water: waterCount };
 }
 
 export function calculateSolutionState(addedNaohVolume: number): SolutionState {

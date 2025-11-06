@@ -16,6 +16,7 @@ export default function IonDisplay({ ionCounts }: IonDisplayProps) {
 
     const hIons = containerRef.current.querySelectorAll('[data-type="h"]');
     const ohIons = containerRef.current.querySelectorAll('[data-type="oh"]');
+    const waterMolecules = containerRef.current.querySelectorAll('[data-type="water"]');
     
     hIons.forEach((ion, index) => {
       const ionElement = ion as HTMLElement;
@@ -31,6 +32,17 @@ export default function IonDisplay({ ionCounts }: IonDisplayProps) {
     ohIons.forEach((ion, index) => {
       const ionElement = ion as HTMLElement;
       if (index < ionCounts.oh) {
+        ionElement.style.opacity = '1';
+        ionElement.style.transform = 'scale(1)';
+      } else {
+        ionElement.style.opacity = '0';
+        ionElement.style.transform = 'scale(0.5)';
+      }
+    });
+
+    waterMolecules.forEach((ion, index) => {
+      const ionElement = ion as HTMLElement;
+      if (index < ionCounts.water) {
         ionElement.style.opacity = '1';
         ionElement.style.transform = 'scale(1)';
       } else {
@@ -65,6 +77,17 @@ export default function IonDisplay({ ionCounts }: IonDisplayProps) {
           style={{ opacity: 0, transform: 'scale(0.5)' }}
         >
           OH⁻
+        </div>
+      ))}
+      {/* Water molecules */}
+      {Array.from({ length: CONSTANTS.NUM_IONS_TO_DISPLAY }).map((_, i) => (
+        <div
+          key={`water-${i}`}
+          data-type="water"
+          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-cyan-400 to-teal-500 transition-all duration-500 ease-in-out animate-scale-in"
+          style={{ opacity: 0, transform: 'scale(0.5)' }}
+        >
+          H₂O
         </div>
       ))}
     </div>

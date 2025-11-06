@@ -14,6 +14,7 @@ export interface IonCounts {
   oh: number;
   na: number;
   cl: number;
+  water: number;
 }
 
 export interface ChartDataPoint {

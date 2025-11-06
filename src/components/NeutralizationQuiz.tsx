@@ -10,7 +10,7 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
   const [options, setOptions] = useState<number[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const correctAnswer = 100; // 중화점: NaOH 100mL 추가 시
+  const correctAnswer = 50; // 중화점: NaOH 50mL 추가 시
 
   useEffect(() => {
     if (show) {
@@ -87,7 +87,7 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
               <div>
                 <p className="font-bold text-green-800 text-lg">정답입니다! 🎉</p>
                 <p className="text-green-700">
-                  중화점은 H⁺와 OH⁻의 몰수가 같아지는 지점으로, 이 실험에서는 100mL입니다.
+                  중화점은 H⁺와 OH⁻의 몰수가 같아지는 지점으로, 이 실험에서는 50mL입니다.
                 </p>
               </div>
             </>
@@ -97,7 +97,7 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
               <div>
                 <p className="font-bold text-red-800 text-lg">틀렸습니다.</p>
                 <p className="text-red-700">
-                  정답은 <span className="font-bold">100 mL</span>입니다. 중화점에서는 BTB 용액이 초록색으로 변하며 온도가 가장 높습니다.
+                  정답은 <span className="font-bold">50 mL</span>입니다. 중화점에서는 BTB 용액이 초록색으로 변하며 온도가 가장 높습니다.
                 </p>
               </div>
             </>
