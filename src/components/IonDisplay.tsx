@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { IonCounts, AcidType, BaseType, ACIDS, BASES } from '@/types/neutralization';
+import { IonCounts, AcidType, BaseType } from '@/types/neutralization';
+import { ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
 
 interface IonDisplayProps {
   ionCounts: IonCounts;
@@ -11,8 +12,8 @@ const MAX_DISPLAY_IONS = 10; // 최대 표시 이온 수
 
 export default function IonDisplay({ ionCounts, acidType, baseType }: IonDisplayProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const acidInfo = ACIDS[acidType];
-  const baseInfo = BASES[baseType];
+  const acidInfo = ACIDS_DATA[acidType];
+  const baseInfo = BASES_DATA[baseType];
 
   useEffect(() => {
     if (!containerRef.current) return;

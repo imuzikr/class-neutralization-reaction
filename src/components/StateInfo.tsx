@@ -1,6 +1,6 @@
-import { SolutionState, INDICATOR_COLORS, IndicatorType, AcidType, BaseType, ACIDS, BASES } from '@/types/neutralization';
+import { SolutionState, INDICATOR_COLORS, IndicatorType, AcidType, BaseType } from '@/types/neutralization';
 import { IonCounts } from '@/types/neutralization';
-import { getAcidityText, getExplanation } from '@/lib/neutralizationCalculations';
+import { getAcidityText, getExplanation, ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
 
 interface StateInfoProps {
   state: SolutionState;
@@ -17,8 +17,8 @@ export default function StateInfo({ state, ionCounts, addedBaseVolume, indicator
   const acidityText = getAcidityText(state);
   const explanation = getExplanation(state, addedBaseVolume, acidType, baseType);
 
-  const acidInfo = ACIDS[acidType];
-  const baseInfo = BASES[baseType];
+  const acidInfo = ACIDS_DATA[acidType];
+  const baseInfo = BASES_DATA[baseType];
 
   return (
     <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col overflow-y-auto">

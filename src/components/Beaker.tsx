@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { INDICATOR_COLORS, SolutionState, IndicatorType, AcidType, BaseType, BASES } from '@/types/neutralization';
+import { INDICATOR_COLORS, SolutionState, IndicatorType, AcidType, BaseType } from '@/types/neutralization';
 import { IonCounts } from '@/types/neutralization';
-import { CONSTANTS } from '@/lib/neutralizationCalculations';
+import { CONSTANTS, BASES_DATA } from '@/lib/neutralizationCalculations';
 import IonDisplay from './IonDisplay';
 
 interface BeakerProps {
@@ -20,7 +20,7 @@ export default function Beaker({ addedBaseVolume, state, ionCounts, isAdding, in
   const beakerFillHeight = (totalVolume / 150) * 100;
   const buretteHeight = 100 - (addedBaseVolume / CONSTANTS.MAX_BASE_VOLUME) * 100;
   const solutionColors = INDICATOR_COLORS[indicator][state];
-  const baseInfo = BASES[baseType];
+  const baseInfo = BASES_DATA[baseType];
 
   useEffect(() => {
     if (isAdding) {

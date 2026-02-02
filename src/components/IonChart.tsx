@@ -10,8 +10,8 @@ import {
   Legend,
   ChartOptions,
 } from 'chart.js';
-import { CONSTANTS } from '@/lib/neutralizationCalculations';
-import { AcidType, BaseType, ACIDS, BASES } from '@/types/neutralization';
+import { CONSTANTS, ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
+import { AcidType, BaseType } from '@/types/neutralization';
 
 ChartJS.register(
   CategoryScale,
@@ -33,8 +33,8 @@ interface IonChartProps {
 }
 
 export default function IonChart({ hData, ohData, baseCationData, acidAnionData, acidType, baseType }: IonChartProps) {
-  const acidInfo = ACIDS[acidType];
-  const baseInfo = BASES[baseType];
+  const acidInfo = ACIDS_DATA[acidType];
+  const baseInfo = BASES_DATA[baseType];
 
   const options: ChartOptions<'line'> = {
     responsive: true,

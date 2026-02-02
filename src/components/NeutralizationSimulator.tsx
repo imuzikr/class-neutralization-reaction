@@ -5,8 +5,8 @@ import StateInfo from './StateInfo';
 import TemperatureChart from './TemperatureChart';
 import IonChart from './IonChart';
 import NeutralizationQuiz from './NeutralizationQuiz';
-import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature, calculateNeutralizationPoint } from '@/lib/neutralizationCalculations';
-import { ChartDataPoint, IndicatorType, AcidType, BaseType, ACIDS, BASES } from '@/types/neutralization';
+import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature, calculateNeutralizationPoint, ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
+import { ChartDataPoint, IndicatorType, AcidType, BaseType } from '@/types/neutralization';
 import { FlaskConical, RotateCcw } from 'lucide-react';
 
 export default function NeutralizationSimulator() {
@@ -29,8 +29,8 @@ export default function NeutralizationSimulator() {
   const state = calculateSolutionState(addedBaseVolume, acidType, baseType);
   const neutralizationPoint = calculateNeutralizationPoint(acidType, baseType);
 
-  const acidInfo = ACIDS[acidType];
-  const baseInfo = BASES[baseType];
+  const acidInfo = ACIDS_DATA[acidType];
+  const baseInfo = BASES_DATA[baseType];
 
   const handleAdd = async () => {
     if (addedBaseVolume >= CONSTANTS.MAX_BASE_VOLUME) return;
