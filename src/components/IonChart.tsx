@@ -11,6 +11,7 @@ import {
   ChartOptions,
 } from 'chart.js';
 import { CONSTANTS } from '@/lib/neutralizationCalculations';
+import { AcidType, BaseType, ACIDS, BASES } from '@/types/neutralization';
 
 ChartJS.register(
   CategoryScale,
@@ -25,11 +26,16 @@ ChartJS.register(
 interface IonChartProps {
   hData: { x: number; y: number }[];
   ohData: { x: number; y: number }[];
-  naData: { x: number; y: number }[];
-  clData: { x: number; y: number }[];
+  baseCationData: { x: number; y: number }[];
+  acidAnionData: { x: number; y: number }[];
+  acidType: AcidType;
+  baseType: BaseType;
 }
 
-export default function IonChart({ hData, ohData, naData, clData }: IonChartProps) {
+export default function IonChart({ hData, ohData, baseCationData, acidAnionData, acidType, baseType }: IonChartProps) {
+  const acidInfo = ACIDS[acidType];
+  const baseInfo = BASES[baseType];
+
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -42,14 +48,14 @@ export default function IonChart({ hData, ohData, naData, clData }: IonChartProp
         type: 'linear',
         title: {
           display: true,
-          text: '첨가한 NaOH 부피 (mL)',
+          text: `첨가한 ${baseInfo.formula} 부피 (mL)`,
           color: '#78350f',
           font: { size: 13, weight: 'bold' },
         },
         ticks: { color: '#92400e' },
         grid: { color: 'rgba(251, 191, 36, 0.15)' },
         min: 0,
-        max: CONSTANTS.MAX_NAOH_VOLUME,
+        max: CONSTANTS.MAX_BASE_VOLUME,
       },
       y: {
         title: {
@@ -90,7 +96,7 @@ export default function IonChart({ hData, ohData, naData, clData }: IonChartProp
   const chartData = {
     datasets: [
       {
-        label: 'H⁺',
+        label: acidInfo.cation,
         data: hData,
         borderColor: '#eab308',
         backgroundColor: 'rgba(234, 179, 8, 0.1)',
@@ -103,7 +109,7 @@ export default function IonChart({ hData, ohData, naData, clData }: IonChartProp
         pointBorderWidth: 2,
       },
       {
-        label: 'OH⁻',
+        label: baseInfo.anion,
         data: ohData,
         borderColor: '#3b82f6',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -116,8 +122,8 @@ export default function IonChart({ hData, ohData, naData, clData }: IonChartProp
         pointBorderWidth: 2,
       },
       {
-        label: 'Na⁺',
-        data: naData,
+        label: baseInfo.cation,
+        data: baseCationData,
         borderColor: '#6b7280',
         backgroundColor: 'rgba(107, 114, 128, 0.1)',
         borderWidth: 3,
@@ -129,8 +135,8 @@ export default function IonChart({ hData, ohData, naData, clData }: IonChartProp
         pointBorderWidth: 2,
       },
       {
-        label: 'Cl⁻',
-        data: clData,
+        label: acidInfo.anion,
+        data: acidAnionData,
         borderColor: '#a1a1aa',
         backgroundColor: 'rgba(161, 161, 170, 0.05)',
         borderWidth: 2,

@@ -1,5 +1,63 @@
 export type SolutionState = 'acid' | 'neutral' | 'base';
 export type IndicatorType = 'btb' | 'phenolphthalein';
+export type AcidType = 'hcl' | 'h2so4';
+export type BaseType = 'naoh' | 'caoh2';
+
+export interface AcidInfo {
+  type: AcidType;
+  name: string;
+  formula: string;
+  valence: number; // 1가 또는 2가
+  cation: string; // H⁺
+  anion: string; // Cl⁻ 또는 SO₄²⁻
+}
+
+export interface BaseInfo {
+  type: BaseType;
+  name: string;
+  formula: string;
+  valence: number; // 1가 또는 2가
+  cation: string; // Na⁺ 또는 Ca²⁺
+  anion: string; // OH⁻
+}
+
+export const ACIDS: Record<AcidType, AcidInfo> = {
+  hcl: {
+    type: 'hcl',
+    name: '묽은 염산',
+    formula: 'HCl',
+    valence: 1,
+    cation: 'H⁺',
+    anion: 'Cl⁻'
+  },
+  h2so4: {
+    type: 'h2so4',
+    name: '묽은 황산',
+    formula: 'H₂SO₄',
+    valence: 2,
+    cation: 'H⁺',
+    anion: 'SO₄²⁻'
+  }
+};
+
+export const BASES: Record<BaseType, BaseInfo> = {
+  naoh: {
+    type: 'naoh',
+    name: '수산화 나트륨',
+    formula: 'NaOH',
+    valence: 1,
+    cation: 'Na⁺',
+    anion: 'OH⁻'
+  },
+  caoh2: {
+    type: 'caoh2',
+    name: '수산화 칼슘',
+    formula: 'Ca(OH)₂',
+    valence: 2,
+    cation: 'Ca²⁺',
+    anion: 'OH⁻'
+  }
+};
 
 export interface SimulationState {
   addedNaohVolume: number;
@@ -12,8 +70,8 @@ export interface SimulationState {
 export interface IonCounts {
   h: number;
   oh: number;
-  na: number;
-  cl: number;
+  baseCation: number; // Na⁺ 또는 Ca²⁺
+  acidAnion: number; // Cl⁻ 또는 SO₄²⁻
   water: number;
 }
 

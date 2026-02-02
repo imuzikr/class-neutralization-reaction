@@ -5,68 +5,82 @@ import StateInfo from './StateInfo';
 import TemperatureChart from './TemperatureChart';
 import IonChart from './IonChart';
 import NeutralizationQuiz from './NeutralizationQuiz';
-import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature } from '@/lib/neutralizationCalculations';
-import { ChartDataPoint, IndicatorType } from '@/types/neutralization';
+import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature, calculateNeutralizationPoint } from '@/lib/neutralizationCalculations';
+import { ChartDataPoint, IndicatorType, AcidType, BaseType, ACIDS, BASES } from '@/types/neutralization';
 import { FlaskConical, RotateCcw } from 'lucide-react';
 
 export default function NeutralizationSimulator() {
-  const [addedNaohVolume, setAddedNaohVolume] = useState(0);
+  const [acidType, setAcidType] = useState<AcidType>('hcl');
+  const [baseType, setBaseType] = useState<BaseType>('naoh');
+  const [addedBaseVolume, setAddedBaseVolume] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [indicator, setIndicator] = useState<IndicatorType>('btb');
   const [tempData, setTempData] = useState<ChartDataPoint[]>([{ x: 0, y: 20 }]);
-  const initialIonCounts = calculateIonCounts(0);
+  
+  const initialIonCounts = calculateIonCounts(0, acidType, baseType);
   const [ionData, setIonData] = useState({
     h: [{ x: 0, y: initialIonCounts.h }] as ChartDataPoint[],
     oh: [{ x: 0, y: initialIonCounts.oh }] as ChartDataPoint[],
-    na: [{ x: 0, y: initialIonCounts.na }] as ChartDataPoint[],
-    cl: [{ x: 0, y: initialIonCounts.cl }] as ChartDataPoint[],
+    baseCation: [{ x: 0, y: initialIonCounts.baseCation }] as ChartDataPoint[],
+    acidAnion: [{ x: 0, y: initialIonCounts.acidAnion }] as ChartDataPoint[],
   });
 
-  const ionCounts = calculateIonCounts(addedNaohVolume);
-  const state = calculateSolutionState(addedNaohVolume);
+  const ionCounts = calculateIonCounts(addedBaseVolume, acidType, baseType);
+  const state = calculateSolutionState(addedBaseVolume, acidType, baseType);
+  const neutralizationPoint = calculateNeutralizationPoint(acidType, baseType);
+
+  const acidInfo = ACIDS[acidType];
+  const baseInfo = BASES[baseType];
 
   const handleAdd = async () => {
-    if (addedNaohVolume >= CONSTANTS.MAX_NAOH_VOLUME) return;
+    if (addedBaseVolume >= CONSTANTS.MAX_BASE_VOLUME) return;
 
     setIsAdding(true);
 
     await new Promise(resolve => setTimeout(resolve, 400));
 
-    const newVolume = addedNaohVolume + CONSTANTS.VOLUME_INCREMENT;
-    setAddedNaohVolume(newVolume);
+    const newVolume = addedBaseVolume + CONSTANTS.VOLUME_INCREMENT;
+    setAddedBaseVolume(newVolume);
 
-    const currentTemp = calculateTemperature(newVolume);
+    const currentTemp = calculateTemperature(newVolume, acidType, baseType);
     const newTempPoint = { x: newVolume, y: currentTemp };
     setTempData(prev => [...prev, newTempPoint]);
 
-    const newIonCounts = calculateIonCounts(newVolume);
+    const newIonCounts = calculateIonCounts(newVolume, acidType, baseType);
     setIonData(prev => ({
       h: [...prev.h, { x: newVolume, y: newIonCounts.h }],
       oh: [...prev.oh, { x: newVolume, y: newIonCounts.oh }],
-      na: [...prev.na, { x: newVolume, y: newIonCounts.na }],
-      cl: [...prev.cl, { x: newVolume, y: newIonCounts.cl }],
+      baseCation: [...prev.baseCation, { x: newVolume, y: newIonCounts.baseCation }],
+      acidAnion: [...prev.acidAnion, { x: newVolume, y: newIonCounts.acidAnion }],
     }));
 
     setIsAdding(false);
   };
 
   const handleReset = () => {
-    // 진행 중인 작업 취소
     setIsAdding(false);
-    
-    // 상태 초기화
-    setAddedNaohVolume(0);
-    const initialIonCounts = calculateIonCounts(0);
+    setAddedBaseVolume(0);
+    const initialIonCounts = calculateIonCounts(0, acidType, baseType);
     setTempData([{ x: 0, y: 20 }]);
     setIonData({
       h: [{ x: 0, y: initialIonCounts.h }],
       oh: [{ x: 0, y: initialIonCounts.oh }],
-      na: [{ x: 0, y: initialIonCounts.na }],
-      cl: [{ x: 0, y: initialIonCounts.cl }],
+      baseCation: [{ x: 0, y: initialIonCounts.baseCation }],
+      acidAnion: [{ x: 0, y: initialIonCounts.acidAnion }],
     });
   };
 
-  const showQuiz = addedNaohVolume >= CONSTANTS.MAX_NAOH_VOLUME;
+  const handleAcidChange = (newAcidType: AcidType) => {
+    setAcidType(newAcidType);
+    handleReset();
+  };
+
+  const handleBaseChange = (newBaseType: BaseType) => {
+    setBaseType(newBaseType);
+    handleReset();
+  };
+
+  const showQuiz = addedBaseVolume >= CONSTANTS.MAX_BASE_VOLUME;
 
   return (
     <div className="w-full max-w-7xl mx-auto bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-3xl shadow-2xl p-6 md:p-8 border-2 border-amber-200">
@@ -78,9 +92,56 @@ export default function NeutralizationSimulator() {
           </h1>
         </div>
         <p className="text-muted-foreground text-sm md:text-base max-w-3xl mx-auto">
-          묽은 염산(HCl)에 수산화 나트륨(NaOH)을 첨가하며 지시약의 색 변화를 관찰해 봅시다.
+          {acidInfo.name}({acidInfo.formula})에 {baseInfo.name}({baseInfo.formula})을 첨가하며 지시약의 색 변화를 관찰해 봅시다.
         </p>
         
+        {/* Acid/Base Selection */}
+        <div className="flex flex-wrap items-center justify-center gap-6 mt-4">
+          <div className="flex items-center gap-3">
+            <span className="font-semibold text-gray-700">산 선택:</span>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => handleAcidChange('hcl')}
+                variant={acidType === 'hcl' ? 'default' : 'outline'}
+                size="sm"
+                className={acidType === 'hcl' ? 'bg-gradient-to-r from-red-400 to-red-500 text-white' : ''}
+              >
+                HCl (1가)
+              </Button>
+              <Button
+                onClick={() => handleAcidChange('h2so4')}
+                variant={acidType === 'h2so4' ? 'default' : 'outline'}
+                size="sm"
+                className={acidType === 'h2so4' ? 'bg-gradient-to-r from-red-400 to-red-500 text-white' : ''}
+              >
+                H₂SO₄ (2가)
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="font-semibold text-gray-700">염기 선택:</span>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => handleBaseChange('naoh')}
+                variant={baseType === 'naoh' ? 'default' : 'outline'}
+                size="sm"
+                className={baseType === 'naoh' ? 'bg-gradient-to-r from-blue-400 to-blue-500 text-white' : ''}
+              >
+                NaOH (1가)
+              </Button>
+              <Button
+                onClick={() => handleBaseChange('caoh2')}
+                variant={baseType === 'caoh2' ? 'default' : 'outline'}
+                size="sm"
+                className={baseType === 'caoh2' ? 'bg-gradient-to-r from-blue-400 to-blue-500 text-white' : ''}
+              >
+                Ca(OH)₂ (2가)
+              </Button>
+            </div>
+          </div>
+        </div>
+
         {/* Indicator Selection */}
         <div className="flex items-center justify-center gap-4 mt-4">
           <span className="font-semibold text-gray-700">지시약 선택:</span>
@@ -103,7 +164,7 @@ export default function NeutralizationSimulator() {
         </div>
       </header>
 
-      <NeutralizationQuiz show={showQuiz} />
+      <NeutralizationQuiz show={showQuiz} neutralizationPoint={neutralizationPoint} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Left Section */}
@@ -112,19 +173,21 @@ export default function NeutralizationSimulator() {
           <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
             <div className="flex justify-center items-end gap-12 md:gap-20 w-full h-[280px] mb-6">
               <Beaker 
-                addedNaohVolume={addedNaohVolume} 
+                addedBaseVolume={addedBaseVolume} 
                 state={state} 
                 ionCounts={ionCounts}
                 isAdding={isAdding}
                 indicator={indicator}
+                acidType={acidType}
+                baseType={baseType}
               />
               <div className="flex flex-col gap-3 pb-4">
                 <Button
                   onClick={handleAdd}
-                  disabled={isAdding || addedNaohVolume >= CONSTANTS.MAX_NAOH_VOLUME}
+                  disabled={isAdding || addedBaseVolume >= CONSTANTS.MAX_BASE_VOLUME}
                   className="w-44 h-12 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  NaOH 10mL 첨가
+                  {baseInfo.formula} 10mL 첨가
                 </Button>
                 <Button
                   onClick={handleReset}
@@ -140,14 +203,17 @@ export default function NeutralizationSimulator() {
             {/* Volume Display */}
             <div className="text-center bg-gradient-to-r from-amber-100 to-orange-100 p-4 rounded-xl border-2 border-amber-300 mt-auto space-y-2">
               <div>
-                <span className="text-sm font-semibold text-gray-700">첨가한 NaOH 부피:</span>
-                <span className="font-bold text-3xl text-primary ml-2">{addedNaohVolume}</span>
+                <span className="text-sm font-semibold text-gray-700">첨가한 {baseInfo.formula} 부피:</span>
+                <span className="font-bold text-3xl text-primary ml-2">{addedBaseVolume}</span>
                 <span className="text-gray-600 ml-1">mL</span>
               </div>
               <div>
                 <span className="text-sm font-semibold text-gray-700">총 용액 부피:</span>
-                <span className="font-bold text-2xl text-primary ml-2">{CONSTANTS.INITIAL_TOTAL_VOLUME + addedNaohVolume}</span>
+                <span className="font-bold text-2xl text-primary ml-2">{CONSTANTS.INITIAL_TOTAL_VOLUME + addedBaseVolume}</span>
                 <span className="text-gray-600 ml-1">mL</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                중화점: {neutralizationPoint}mL
               </div>
             </div>
           </div>
@@ -156,8 +222,10 @@ export default function NeutralizationSimulator() {
           <StateInfo 
             state={state} 
             ionCounts={ionCounts} 
-            addedNaohVolume={addedNaohVolume}
+            addedBaseVolume={addedBaseVolume}
             indicator={indicator}
+            acidType={acidType}
+            baseType={baseType}
           />
         </div>
 
@@ -171,8 +239,10 @@ export default function NeutralizationSimulator() {
               <IonChart 
                 hData={ionData.h}
                 ohData={ionData.oh}
-                naData={ionData.na}
-                clData={ionData.cl}
+                baseCationData={ionData.baseCation}
+                acidAnionData={ionData.acidAnion}
+                acidType={acidType}
+                baseType={baseType}
               />
             </div>
           </div>
@@ -182,7 +252,7 @@ export default function NeutralizationSimulator() {
               온도 변화 그래프
             </h2>
             <div className="flex-1">
-              <TemperatureChart data={tempData} />
+              <TemperatureChart data={tempData} baseType={baseType} />
             </div>
           </div>
         </div>
