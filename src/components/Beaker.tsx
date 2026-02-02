@@ -1,25 +1,26 @@
 import { useState, useEffect } from 'react';
-import { INDICATOR_COLORS, SolutionState, IndicatorType } from '@/types/neutralization';
+import { INDICATOR_COLORS, SolutionState, IndicatorType, AcidType, BaseType, BASES } from '@/types/neutralization';
 import { IonCounts } from '@/types/neutralization';
 import { CONSTANTS } from '@/lib/neutralizationCalculations';
 import IonDisplay from './IonDisplay';
 
 interface BeakerProps {
-  addedNaohVolume: number;
+  addedBaseVolume: number;
   state: SolutionState;
   ionCounts: IonCounts;
   isAdding: boolean;
   indicator: IndicatorType;
+  acidType: AcidType;
+  baseType: BaseType;
 }
 
-export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, indicator }: BeakerProps) {
+export default function Beaker({ addedBaseVolume, state, ionCounts, isAdding, indicator, acidType, baseType }: BeakerProps) {
   const [dropVisible, setDropVisible] = useState(false);
-  // 총 부피 = 초기 HCl 50mL + 추가된 NaOH
-  // 비커 최대 150mL 기준: 50mL(33.33%), 100mL(66.67%), 150mL(100%)
-  const totalVolume = CONSTANTS.INITIAL_TOTAL_VOLUME + addedNaohVolume;
+  const totalVolume = CONSTANTS.INITIAL_TOTAL_VOLUME + addedBaseVolume;
   const beakerFillHeight = (totalVolume / 150) * 100;
-  const buretteHeight = 100 - (addedNaohVolume / CONSTANTS.MAX_NAOH_VOLUME) * 100;
+  const buretteHeight = 100 - (addedBaseVolume / CONSTANTS.MAX_BASE_VOLUME) * 100;
   const solutionColors = INDICATOR_COLORS[indicator][state];
+  const baseInfo = BASES[baseType];
 
   useEffect(() => {
     if (isAdding) {
@@ -51,7 +52,7 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
           }`}
           style={{ animation: dropVisible ? 'dropFall 0.4s ease-in forwards' : 'none' }}
         >
-          OH⁻
+          {baseInfo.anion}
         </div>
       </div>
 
@@ -61,12 +62,12 @@ export default function Beaker({ addedNaohVolume, state, ionCounts, isAdding, in
           className={`w-full transition-all duration-500 ease-in-out rounded-b-2xl relative ${solutionColors.solution}`}
           style={{ height: `${Math.min(100, beakerFillHeight)}%` }}
         >
-          <IonDisplay ionCounts={ionCounts} />
+          <IonDisplay ionCounts={ionCounts} acidType={acidType} baseType={baseType} />
           {/* Liquid shine effect */}
           <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent rounded-t-2xl" />
         </div>
         
-        {/* Beaker markings - 비커 높이 100% = 150mL 기준 */}
+        {/* Beaker markings */}
         <div className="absolute right-[-25px] top-0 bottom-0 w-20 text-xs text-gray-500 font-medium">
           <div className="absolute top-0 flex items-center gap-1">
             <span className="w-3 h-px bg-gray-400" />

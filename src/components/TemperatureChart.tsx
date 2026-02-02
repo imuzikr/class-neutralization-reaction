@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -11,7 +10,7 @@ import {
   Legend,
   ChartOptions,
 } from 'chart.js';
-import { ChartDataPoint } from '@/types/neutralization';
+import { ChartDataPoint, BaseType, BASES } from '@/types/neutralization';
 import { CONSTANTS } from '@/lib/neutralizationCalculations';
 
 ChartJS.register(
@@ -26,9 +25,12 @@ ChartJS.register(
 
 interface TemperatureChartProps {
   data: ChartDataPoint[];
+  baseType: BaseType;
 }
 
-export default function TemperatureChart({ data }: TemperatureChartProps) {
+export default function TemperatureChart({ data, baseType }: TemperatureChartProps) {
+  const baseInfo = BASES[baseType];
+
   const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
@@ -41,14 +43,14 @@ export default function TemperatureChart({ data }: TemperatureChartProps) {
         type: 'linear',
         title: {
           display: true,
-          text: '첨가한 NaOH 부피 (mL)',
+          text: `첨가한 ${baseInfo.formula} 부피 (mL)`,
           color: '#78350f',
           font: { size: 13, weight: 'bold' },
         },
         ticks: { color: '#92400e' },
         grid: { color: 'rgba(251, 191, 36, 0.15)' },
         min: 0,
-        max: CONSTANTS.MAX_NAOH_VOLUME,
+        max: CONSTANTS.MAX_BASE_VOLUME,
       },
       y: {
         title: {

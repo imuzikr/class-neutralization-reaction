@@ -4,32 +4,33 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface NeutralizationQuizProps {
   show: boolean;
+  neutralizationPoint: number;
 }
 
-export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
+export default function NeutralizationQuiz({ show, neutralizationPoint }: NeutralizationQuizProps) {
   const [options, setOptions] = useState<number[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  const correctAnswer = 50; // 중화점: NaOH 50mL 추가 시
+  const correctAnswer = neutralizationPoint;
 
   useEffect(() => {
     if (show) {
       generateOptions();
     }
-  }, [show]);
+  }, [show, neutralizationPoint]);
 
   const generateOptions = () => {
-    // 10의 배수인 선택지 생성 (0, 10, 20, ..., 100)
-    const possibleValues = Array.from({ length: 11 }, (_, i) => i * 10);
+    // 10의 배수인 선택지 생성 (10, 20, ..., 100)
+    const possibleValues = Array.from({ length: 10 }, (_, i) => (i + 1) * 10);
     
-    // 100을 제외한 값들
+    // 정답을 제외한 값들
     const withoutCorrect = possibleValues.filter(v => v !== correctAnswer);
     
     // 랜덤하게 4개 선택
     const shuffled = [...withoutCorrect].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, 4);
     
-    // 100 추가하고 오름차순 정렬
+    // 정답 추가하고 오름차순 정렬
     const finalOptions = [...selected, correctAnswer].sort((a, b) => a - b);
     
     setOptions(finalOptions);
@@ -47,12 +48,12 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
   const isCorrect = selectedAnswer === correctAnswer;
 
   return (
-    <div className="glass-panel p-6 rounded-xl animate-fade-in">
+    <div className="glass-panel p-6 rounded-xl animate-fade-in mb-8">
       <h2 className="text-2xl font-bold mb-4 text-center bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
         🎓 중화점 확인 문제
       </h2>
       <p className="text-center text-lg mb-6 text-gray-700">
-        이 실험에서 중화점에 도달했을 때 첨가한 NaOH의 부피는?
+        이 실험에서 중화점에 도달했을 때 첨가한 염기의 부피는?
       </p>
       
       <div className="grid grid-cols-5 gap-3 mb-6">
@@ -87,7 +88,7 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
               <div>
                 <p className="font-bold text-green-800 text-lg">정답입니다! 🎉</p>
                 <p className="text-green-700">
-                  중화점은 H⁺와 OH⁻의 몰수가 같아지는 지점으로, 이 실험에서는 50mL입니다.
+                  중화점은 H⁺와 OH⁻의 몰수가 같아지는 지점으로, 이 실험에서는 {correctAnswer}mL입니다.
                 </p>
               </div>
             </>
@@ -97,7 +98,7 @@ export default function NeutralizationQuiz({ show }: NeutralizationQuizProps) {
               <div>
                 <p className="font-bold text-red-800 text-lg">틀렸습니다.</p>
                 <p className="text-red-700">
-                  정답은 <span className="font-bold">50 mL</span>입니다. 중화점에서는 BTB 용액이 초록색으로 변하며 온도가 가장 높습니다.
+                  정답은 <span className="font-bold">{correctAnswer} mL</span>입니다. 중화점에서는 BTB 용액이 초록색으로 변하며 온도가 가장 높습니다.
                 </p>
               </div>
             </>
