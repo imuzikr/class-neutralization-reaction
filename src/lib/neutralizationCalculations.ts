@@ -1,4 +1,43 @@
-import { SolutionState, IonCounts, AcidType, BaseType, ACIDS, BASES } from '@/types/neutralization';
+import { SolutionState, IonCounts, AcidType, BaseType } from '@/types/neutralization';
+
+// ACIDS와 BASES를 여기서 직접 정의하여 순환 참조 문제 해결
+export const ACIDS_DATA = {
+  hcl: {
+    type: 'hcl' as AcidType,
+    name: '묽은 염산',
+    formula: 'HCl',
+    valence: 1,
+    cation: 'H⁺',
+    anion: 'Cl⁻'
+  },
+  h2so4: {
+    type: 'h2so4' as AcidType,
+    name: '묽은 황산',
+    formula: 'H₂SO₄',
+    valence: 2,
+    cation: 'H⁺',
+    anion: 'SO₄²⁻'
+  }
+};
+
+export const BASES_DATA = {
+  naoh: {
+    type: 'naoh' as BaseType,
+    name: '수산화 나트륨',
+    formula: 'NaOH',
+    valence: 1,
+    cation: 'Na⁺',
+    anion: 'OH⁻'
+  },
+  caoh2: {
+    type: 'caoh2' as BaseType,
+    name: '수산화 칼슘',
+    formula: 'Ca(OH)₂',
+    valence: 2,
+    cation: 'Ca²⁺',
+    anion: 'OH⁻'
+  }
+};
 
 export const CONSTANTS = {
   INITIAL_ACID_MOLES: 0.005,
@@ -6,20 +45,16 @@ export const CONSTANTS = {
   VOLUME_INCREMENT: 10,
   INITIAL_TOTAL_VOLUME: 50,
   MAX_BASE_VOLUME: 100,
-  NEUTRALIZATION_POINT_1V: 50, // 1가-1가 중화점
+  NEUTRALIZATION_POINT_1V: 50,
   NUM_IONS_TO_DISPLAY: 5,
   TOLERANCE: 1e-9
 };
 
 // 중화점 계산: 산의 가수 × 산의 몰 = 염기의 가수 × 염기의 몰
 export function calculateNeutralizationPoint(acidType: AcidType, baseType: BaseType): number {
-  const acidValence = ACIDS[acidType].valence;
-  const baseValence = BASES[baseType].valence;
+  const acidValence = ACIDS_DATA[acidType].valence;
+  const baseValence = BASES_DATA[baseType].valence;
   
-  // n(H⁺) = n(OH⁻)
-  // acidValence × acidMoles = baseValence × baseMoles
-  // baseMoles = (acidValence × acidMoles) / baseValence
-  // baseVolume(mL) = baseMoles / BASE_CONCENTRATION × 1000
   const baseMolesNeeded = (acidValence * CONSTANTS.INITIAL_ACID_MOLES) / baseValence;
   const baseVolumeNeeded = (baseMolesNeeded / CONSTANTS.BASE_CONCENTRATION) * 1000;
   
@@ -27,12 +62,11 @@ export function calculateNeutralizationPoint(acidType: AcidType, baseType: BaseT
 }
 
 export function calculateIonFactors(addedBaseVolume: number, acidType: AcidType, baseType: BaseType) {
-  const acidValence = ACIDS[acidType].valence;
-  const baseValence = BASES[baseType].valence;
+  const acidValence = ACIDS_DATA[acidType].valence;
+  const baseValence = BASES_DATA[baseType].valence;
   
   const baseMolesAdded = (addedBaseVolume / 1000) * CONSTANTS.BASE_CONCENTRATION;
   
-  // H⁺ 몰수 = 산의 가수 × 산의 몰수 - 염기의 가수 × 염기의 몰수
   let hMoles = acidValence * CONSTANTS.INITIAL_ACID_MOLES - baseValence * baseMolesAdded;
   let ohMoles = baseValence * baseMolesAdded - acidValence * CONSTANTS.INITIAL_ACID_MOLES;
 
@@ -53,25 +87,19 @@ export function calculateIonFactors(addedBaseVolume: number, acidType: AcidType,
 export function calculateIonCounts(addedBaseVolume: number, acidType: AcidType, baseType: BaseType): IonCounts {
   const { hIonFactor, ohIonFactor, baseMolesAdded, acidValence, baseValence } = calculateIonFactors(addedBaseVolume, acidType, baseType);
   
-  // 10mL당 이온 수: 1가 = 1개, 2가 = 2개
   const ionMultiplier = (volume: number, valence: number) => {
     return Math.round((volume / 10) * valence);
   };
 
-  // H⁺ 이온: 초기 산의 H⁺ 수에서 반응한 만큼 감소
   const initialHCount = ionMultiplier(CONSTANTS.INITIAL_TOTAL_VOLUME, acidValence);
   const hCount = Math.round(hIonFactor * initialHCount);
   
-  // OH⁻ 이온: 과잉 염기의 OH⁻ 수
   const ohCount = Math.round(ohIonFactor * initialHCount);
   
-  // 산의 음이온 (Cl⁻ 또는 SO₄²⁻): 초기 산의 몰수에 비례, 변하지 않음
-  const acidAnionCount = ionMultiplier(CONSTANTS.INITIAL_TOTAL_VOLUME, 1); // 음이온은 항상 산 1분자당 1개
+  const acidAnionCount = ionMultiplier(CONSTANTS.INITIAL_TOTAL_VOLUME, 1);
   
-  // 염기의 양이온 (Na⁺ 또는 Ca²⁺): 첨가된 염기의 몰수에 비례
-  const baseCationCount = ionMultiplier(addedBaseVolume, 1); // 양이온은 염기 1분자당 1개
+  const baseCationCount = ionMultiplier(addedBaseVolume, 1);
   
-  // 물 분자: 반응한 H⁺/OH⁻ 수만큼 생성
   const neutralizationPoint = calculateNeutralizationPoint(acidType, baseType);
   const reactedVolume = Math.min(addedBaseVolume, neutralizationPoint);
   const waterCount = ionMultiplier(reactedVolume, Math.min(acidValence, baseValence));
@@ -105,8 +133,8 @@ export function calculateTemperature(addedBaseVolume: number, acidType: AcidType
 }
 
 export function getExplanation(state: SolutionState, addedBaseVolume: number, acidType: AcidType, baseType: BaseType): string {
-  const acidInfo = ACIDS[acidType];
-  const baseInfo = BASES[baseType];
+  const acidInfo = ACIDS_DATA[acidType];
+  const baseInfo = BASES_DATA[baseType];
   
   if (addedBaseVolume === 0) {
     return `초기 50mL의 ${acidInfo.name}(${acidInfo.formula})은 ${acidInfo.cation} 이온 때문에 산성을 띠며, BTB 용액은 노란색입니다.`;
