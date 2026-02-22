@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { INDICATOR_COLORS, SolutionState, IndicatorType, AcidType, BaseType } from '@/types/neutralization';
+import { INDICATOR_COLORS, SolutionState, IndicatorType, AcidType, BaseType, IonDisplayMode } from '@/types/neutralization';
 import { IonCounts } from '@/types/neutralization';
 import { CONSTANTS, BASES_DATA } from '@/lib/neutralizationCalculations';
 import IonDisplay from './IonDisplay';
@@ -12,9 +12,10 @@ interface BeakerProps {
   indicator: IndicatorType;
   acidType: AcidType;
   baseType: BaseType;
+  ionDisplayMode: IonDisplayMode;
 }
 
-export default function Beaker({ addedBaseVolume, state, ionCounts, isAdding, indicator, acidType, baseType }: BeakerProps) {
+export default function Beaker({ addedBaseVolume, state, ionCounts, isAdding, indicator, acidType, baseType, ionDisplayMode }: BeakerProps) {
   const [dropVisible, setDropVisible] = useState(false);
   const totalVolume = CONSTANTS.INITIAL_TOTAL_VOLUME + addedBaseVolume;
   const beakerFillHeight = (totalVolume / 150) * 100;
@@ -62,7 +63,7 @@ export default function Beaker({ addedBaseVolume, state, ionCounts, isAdding, in
           className={`w-full transition-all duration-500 ease-in-out rounded-b-2xl relative ${solutionColors.solution}`}
           style={{ height: `${Math.min(100, beakerFillHeight)}%` }}
         >
-          <IonDisplay ionCounts={ionCounts} acidType={acidType} baseType={baseType} />
+          <IonDisplay ionCounts={ionCounts} acidType={acidType} baseType={baseType} ionDisplayMode={ionDisplayMode} />
           {/* Liquid shine effect */}
           <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent rounded-t-2xl" />
         </div>

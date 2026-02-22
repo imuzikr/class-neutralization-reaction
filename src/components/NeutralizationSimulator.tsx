@@ -4,9 +4,8 @@ import Beaker from './Beaker';
 import StateInfo from './StateInfo';
 import TemperatureChart from './TemperatureChart';
 import IonChart from './IonChart';
-import NeutralizationQuiz from './NeutralizationQuiz';
 import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature, calculateNeutralizationPoint, ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
-import { ChartDataPoint, IndicatorType, AcidType, BaseType } from '@/types/neutralization';
+import { ChartDataPoint, IndicatorType, AcidType, BaseType, IonDisplayMode } from '@/types/neutralization';
 import { FlaskConical, RotateCcw } from 'lucide-react';
 
 export default function NeutralizationSimulator() {
@@ -15,6 +14,7 @@ export default function NeutralizationSimulator() {
   const [addedBaseVolume, setAddedBaseVolume] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [indicator, setIndicator] = useState<IndicatorType>('btb');
+  const [ionDisplayMode, setIonDisplayMode] = useState<IonDisplayMode>('all');
   const [tempData, setTempData] = useState<ChartDataPoint[]>([{ x: 0, y: 20 }]);
   
   const initialIonCounts = calculateIonCounts(0, acidType, baseType);
@@ -84,7 +84,7 @@ export default function NeutralizationSimulator() {
     resetWithTypes(acidType, newBaseType);
   };
 
-  const showQuiz = addedBaseVolume >= CONSTANTS.MAX_BASE_VOLUME;
+  
 
   return (
     <div className="w-full max-w-7xl mx-auto bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-3xl shadow-2xl p-6 md:p-8 border-2 border-amber-200">
@@ -166,9 +166,38 @@ export default function NeutralizationSimulator() {
             </Button>
           </div>
         </div>
-      </header>
 
-      <NeutralizationQuiz show={showQuiz} neutralizationPoint={neutralizationPoint} />
+        {/* Ion Display Mode Selection */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <span className="font-semibold text-gray-700">이온 모형:</span>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setIonDisplayMode('all')}
+              variant={ionDisplayMode === 'all' ? 'default' : 'outline'}
+              size="sm"
+              className={ionDisplayMode === 'all' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : ''}
+            >
+              전체 이온
+            </Button>
+            <Button
+              onClick={() => setIonDisplayMode('net')}
+              variant={ionDisplayMode === 'net' ? 'default' : 'outline'}
+              size="sm"
+              className={ionDisplayMode === 'net' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : ''}
+            >
+              알짜 이온
+            </Button>
+            <Button
+              onClick={() => setIonDisplayMode('spectator')}
+              variant={ionDisplayMode === 'spectator' ? 'default' : 'outline'}
+              size="sm"
+              className={ionDisplayMode === 'spectator' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : ''}
+            >
+              구경꾼 이온
+            </Button>
+          </div>
+        </div>
+      </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Left Section */}
@@ -184,6 +213,7 @@ export default function NeutralizationSimulator() {
                 indicator={indicator}
                 acidType={acidType}
                 baseType={baseType}
+                ionDisplayMode={ionDisplayMode}
               />
               <div className="flex flex-col gap-3 pb-4">
                 <Button

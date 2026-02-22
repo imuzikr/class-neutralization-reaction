@@ -1,16 +1,16 @@
-import { useEffect, useRef, useMemo } from 'react';
-import { IonCounts, AcidType, BaseType } from '@/types/neutralization';
+import { useMemo } from 'react';
+import { IonCounts, AcidType, BaseType, IonDisplayMode } from '@/types/neutralization';
 import { ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
 
 interface IonDisplayProps {
   ionCounts: IonCounts;
   acidType: AcidType;
   baseType: BaseType;
+  ionDisplayMode: IonDisplayMode;
 }
 
 const MAX_DISPLAY_IONS = 10;
 
-// Generate stable random positions for ions
 function generatePositions(count: number, seed: number) {
   const positions: { x: number; y: number }[] = [];
   for (let i = 0; i < count; i++) {
@@ -22,9 +22,25 @@ function generatePositions(count: number, seed: number) {
   return positions;
 }
 
-export default function IonDisplay({ ionCounts, acidType, baseType }: IonDisplayProps) {
+// 알짜 이온: 실제 반응에 참여하는 이온 (H⁺, OH⁻, H₂O)
+// 구경꾼 이온: 반응에 참여하지 않는 이온 (Na⁺/Ca²⁺, Cl⁻/SO₄²⁻)
+function getFilteredCounts(ionCounts: IonCounts, mode: IonDisplayMode): IonCounts {
+  switch (mode) {
+    case 'all':
+      return ionCounts;
+    case 'net':
+      // 알짜 이온: H⁺, OH⁻, H₂O만 표시
+      return { h: ionCounts.h, oh: ionCounts.oh, water: ionCounts.water, baseCation: 0, acidAnion: 0 };
+    case 'spectator':
+      // 구경꾼 이온: 양이온(Na⁺/Ca²⁺), 음이온(Cl⁻/SO₄²⁻)만 표시
+      return { h: 0, oh: 0, water: 0, baseCation: ionCounts.baseCation, acidAnion: ionCounts.acidAnion };
+  }
+}
+
+export default function IonDisplay({ ionCounts, acidType, baseType, ionDisplayMode }: IonDisplayProps) {
   const acidInfo = ACIDS_DATA[acidType];
   const baseInfo = BASES_DATA[baseType];
+  const filtered = getFilteredCounts(ionCounts, ionDisplayMode);
 
   const hPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 1), []);
   const ohPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 100), []);
@@ -58,11 +74,11 @@ export default function IonDisplay({ ionCounts, acidType, baseType }: IonDisplay
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {renderIon('h', acidInfo.cation, 'bg-gradient-to-br from-red-400 to-red-600', hPositions, ionCounts.h)}
-      {renderIon('oh', baseInfo.anion, 'bg-gradient-to-br from-blue-400 to-blue-600', ohPositions, ionCounts.oh)}
-      {renderIon('water', 'H₂O', 'bg-gradient-to-br from-cyan-400 to-teal-500', waterPositions, ionCounts.water)}
-      {renderIon('baseCation', baseInfo.cation, 'bg-gradient-to-br from-purple-400 to-purple-600', baseCationPositions, ionCounts.baseCation)}
-      {renderIon('acidAnion', acidInfo.anion, 'bg-gradient-to-br from-green-400 to-green-600', acidAnionPositions, ionCounts.acidAnion)}
+      {renderIon('h', acidInfo.cation, 'bg-gradient-to-br from-red-400 to-red-600', hPositions, filtered.h)}
+      {renderIon('oh', baseInfo.anion, 'bg-gradient-to-br from-blue-400 to-blue-600', ohPositions, filtered.oh)}
+      {renderIon('water', 'H₂O', 'bg-gradient-to-br from-cyan-400 to-teal-500', waterPositions, filtered.water)}
+      {renderIon('baseCation', baseInfo.cation, 'bg-gradient-to-br from-purple-400 to-purple-600', baseCationPositions, filtered.baseCation)}
+      {renderIon('acidAnion', acidInfo.anion, 'bg-gradient-to-br from-green-400 to-green-600', acidAnionPositions, filtered.acidAnion)}
     </div>
   );
 }
