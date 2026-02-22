@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { IonCounts, AcidType, BaseType } from '@/types/neutralization';
 import { ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
 
@@ -8,138 +8,61 @@ interface IonDisplayProps {
   baseType: BaseType;
 }
 
-const MAX_DISPLAY_IONS = 10; // 최대 표시 이온 수
+const MAX_DISPLAY_IONS = 10;
+
+// Generate stable random positions for ions
+function generatePositions(count: number, seed: number) {
+  const positions: { x: number; y: number }[] = [];
+  for (let i = 0; i < count; i++) {
+    const s = seed + i * 137;
+    const x = ((s * 2654435761) % 100);
+    const y = ((s * 40503) % 100);
+    positions.push({ x: Math.abs(x % 80) + 5, y: Math.abs(y % 70) + 10 });
+  }
+  return positions;
+}
 
 export default function IonDisplay({ ionCounts, acidType, baseType }: IonDisplayProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const acidInfo = ACIDS_DATA[acidType];
   const baseInfo = BASES_DATA[baseType];
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+  const hPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 1), []);
+  const ohPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 100), []);
+  const waterPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 200), []);
+  const baseCationPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 300), []);
+  const acidAnionPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 400), []);
 
-    const hIons = containerRef.current.querySelectorAll('[data-type="h"]');
-    const ohIons = containerRef.current.querySelectorAll('[data-type="oh"]');
-    const waterMolecules = containerRef.current.querySelectorAll('[data-type="water"]');
-    const baseCations = containerRef.current.querySelectorAll('[data-type="baseCation"]');
-    const acidAnions = containerRef.current.querySelectorAll('[data-type="acidAnion"]');
-    
-    hIons.forEach((ion, index) => {
-      const ionElement = ion as HTMLElement;
-      if (index < ionCounts.h) {
-        ionElement.style.opacity = '1';
-        ionElement.style.transform = 'scale(1)';
-      } else {
-        ionElement.style.opacity = '0';
-        ionElement.style.transform = 'scale(0.5)';
-      }
-    });
-
-    ohIons.forEach((ion, index) => {
-      const ionElement = ion as HTMLElement;
-      if (index < ionCounts.oh) {
-        ionElement.style.opacity = '1';
-        ionElement.style.transform = 'scale(1)';
-      } else {
-        ionElement.style.opacity = '0';
-        ionElement.style.transform = 'scale(0.5)';
-      }
-    });
-
-    waterMolecules.forEach((ion, index) => {
-      const ionElement = ion as HTMLElement;
-      if (index < ionCounts.water) {
-        ionElement.style.opacity = '1';
-        ionElement.style.transform = 'scale(1)';
-      } else {
-        ionElement.style.opacity = '0';
-        ionElement.style.transform = 'scale(0.5)';
-      }
-    });
-
-    baseCations.forEach((ion, index) => {
-      const ionElement = ion as HTMLElement;
-      if (index < ionCounts.baseCation) {
-        ionElement.style.opacity = '1';
-        ionElement.style.transform = 'scale(1)';
-      } else {
-        ionElement.style.opacity = '0';
-        ionElement.style.transform = 'scale(0.5)';
-      }
-    });
-
-    acidAnions.forEach((ion, index) => {
-      const ionElement = ion as HTMLElement;
-      if (index < ionCounts.acidAnion) {
-        ionElement.style.opacity = '1';
-        ionElement.style.transform = 'scale(1)';
-      } else {
-        ionElement.style.opacity = '0';
-        ionElement.style.transform = 'scale(0.5)';
-      }
-    });
-  }, [ionCounts]);
+  const renderIon = (
+    key: string,
+    label: string,
+    colorClass: string,
+    positions: { x: number; y: number }[],
+    visibleCount: number
+  ) =>
+    Array.from({ length: MAX_DISPLAY_IONS }).map((_, i) => (
+      <div
+        key={`${key}-${i}`}
+        className={`absolute w-5 h-5 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 ease-in-out ${colorClass}`}
+        style={{
+          left: `${positions[i].x}%`,
+          top: `${positions[i].y}%`,
+          opacity: i < visibleCount ? 1 : 0,
+          transform: i < visibleCount ? 'scale(1)' : 'scale(0)',
+          fontSize: '8px',
+          zIndex: i < visibleCount ? 2 : 0,
+        }}
+      >
+        {label}
+      </div>
+    ));
 
   return (
-    <div 
-      ref={containerRef}
-      className="absolute inset-0 flex flex-wrap items-center justify-center p-2 gap-1 overflow-hidden"
-    >
-      {/* H+ ions */}
-      {Array.from({ length: MAX_DISPLAY_IONS }).map((_, i) => (
-        <div
-          key={`h-${i}`}
-          data-type="h"
-          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-red-400 to-red-600 transition-all duration-500 ease-in-out"
-          style={{ opacity: 0, transform: 'scale(0.5)' }}
-        >
-          {acidInfo.cation}
-        </div>
-      ))}
-      {/* OH- ions */}
-      {Array.from({ length: MAX_DISPLAY_IONS }).map((_, i) => (
-        <div
-          key={`oh-${i}`}
-          data-type="oh"
-          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-blue-400 to-blue-600 transition-all duration-500 ease-in-out"
-          style={{ opacity: 0, transform: 'scale(0.5)' }}
-        >
-          {baseInfo.anion}
-        </div>
-      ))}
-      {/* Water molecules */}
-      {Array.from({ length: MAX_DISPLAY_IONS }).map((_, i) => (
-        <div
-          key={`water-${i}`}
-          data-type="water"
-          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-cyan-400 to-teal-500 transition-all duration-500 ease-in-out"
-          style={{ opacity: 0, transform: 'scale(0.5)' }}
-        >
-          H₂O
-        </div>
-      ))}
-      {/* Base cations (Na+ or Ca2+) */}
-      {Array.from({ length: MAX_DISPLAY_IONS }).map((_, i) => (
-        <div
-          key={`baseCation-${i}`}
-          data-type="baseCation"
-          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-purple-400 to-purple-600 transition-all duration-500 ease-in-out"
-          style={{ opacity: 0, transform: 'scale(0.5)' }}
-        >
-          {baseInfo.cation}
-        </div>
-      ))}
-      {/* Acid anions (Cl- or SO4 2-) */}
-      {Array.from({ length: MAX_DISPLAY_IONS }).map((_, i) => (
-        <div
-          key={`acidAnion-${i}`}
-          data-type="acidAnion"
-          className="ion w-5 h-5 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg bg-gradient-to-br from-green-400 to-green-600 transition-all duration-500 ease-in-out"
-          style={{ opacity: 0, transform: 'scale(0.5)' }}
-        >
-          {acidInfo.anion}
-        </div>
-      ))}
+    <div className="absolute inset-0 overflow-hidden">
+      {renderIon('h', acidInfo.cation, 'bg-gradient-to-br from-red-400 to-red-600', hPositions, ionCounts.h)}
+      {renderIon('oh', baseInfo.anion, 'bg-gradient-to-br from-blue-400 to-blue-600', ohPositions, ionCounts.oh)}
+      {renderIon('water', 'H₂O', 'bg-gradient-to-br from-cyan-400 to-teal-500', waterPositions, ionCounts.water)}
+      {renderIon('baseCation', baseInfo.cation, 'bg-gradient-to-br from-purple-400 to-purple-600', baseCationPositions, ionCounts.baseCation)}
+      {renderIon('acidAnion', acidInfo.anion, 'bg-gradient-to-br from-green-400 to-green-600', acidAnionPositions, ionCounts.acidAnion)}
     </div>
   );
 }
