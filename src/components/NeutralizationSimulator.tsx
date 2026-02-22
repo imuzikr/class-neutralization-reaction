@@ -57,27 +57,31 @@ export default function NeutralizationSimulator() {
     setIsAdding(false);
   };
 
-  const handleReset = () => {
+  const resetWithTypes = (newAcidType: AcidType, newBaseType: BaseType) => {
     setIsAdding(false);
     setAddedBaseVolume(0);
-    const initialIonCounts = calculateIonCounts(0, acidType, baseType);
+    const counts = calculateIonCounts(0, newAcidType, newBaseType);
     setTempData([{ x: 0, y: 20 }]);
     setIonData({
-      h: [{ x: 0, y: initialIonCounts.h }],
-      oh: [{ x: 0, y: initialIonCounts.oh }],
-      baseCation: [{ x: 0, y: initialIonCounts.baseCation }],
-      acidAnion: [{ x: 0, y: initialIonCounts.acidAnion }],
+      h: [{ x: 0, y: counts.h }],
+      oh: [{ x: 0, y: counts.oh }],
+      baseCation: [{ x: 0, y: counts.baseCation }],
+      acidAnion: [{ x: 0, y: counts.acidAnion }],
     });
+  };
+
+  const handleReset = () => {
+    resetWithTypes(acidType, baseType);
   };
 
   const handleAcidChange = (newAcidType: AcidType) => {
     setAcidType(newAcidType);
-    handleReset();
+    resetWithTypes(newAcidType, baseType);
   };
 
   const handleBaseChange = (newBaseType: BaseType) => {
     setBaseType(newBaseType);
-    handleReset();
+    resetWithTypes(acidType, newBaseType);
   };
 
   const showQuiz = addedBaseVolume >= CONSTANTS.MAX_BASE_VOLUME;
