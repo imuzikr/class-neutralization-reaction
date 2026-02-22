@@ -2,6 +2,7 @@ export type SolutionState = 'acid' | 'neutral' | 'base';
 export type IndicatorType = 'btb' | 'phenolphthalein';
 export type AcidType = 'hcl' | 'h2so4';
 export type BaseType = 'naoh' | 'caoh2';
+export type IonDisplayMode = 'all' | 'net' | 'spectator';
 
 export interface AcidInfo {
   type: AcidType;
