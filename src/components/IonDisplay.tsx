@@ -37,10 +37,10 @@ function getFilteredCounts(ionCounts: IonCounts, mode: IonDisplayMode): IonCount
   }
 }
 
-export default function IonDisplay({ ionCounts, acidType, baseType, ionDisplayMode }: IonDisplayProps) {
+export default function IonDisplay({ ionCounts, acidType, baseType, ionDisplayMode = 'all' }: IonDisplayProps) {
   const acidInfo = ACIDS_DATA[acidType];
   const baseInfo = BASES_DATA[baseType];
-  const filtered = getFilteredCounts(ionCounts, ionDisplayMode);
+  const filtered = getFilteredCounts(ionCounts, ionDisplayMode) ?? ionCounts;
 
   const hPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 1), []);
   const ohPositions = useMemo(() => generatePositions(MAX_DISPLAY_IONS, 100), []);
