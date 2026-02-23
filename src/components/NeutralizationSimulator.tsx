@@ -179,7 +179,7 @@ export default function NeutralizationSimulator() {
           {/* Simulation Area */}
           <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
             {/* Ion Display Mode - small buttons */}
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-3 justify-end">
               <span className="text-xs font-semibold text-muted-foreground">이온 모형:</span>
               <div className="flex gap-1">
                 {(['all', 'net', 'spectator'] as IonDisplayMode[]).map((mode) => (
