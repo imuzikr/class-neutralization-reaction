@@ -171,36 +171,6 @@ export default function NeutralizationSimulator() {
           </div>
         </div>
 
-        {/* Ion Display Mode */}
-        <div className="glass-panel rounded-xl p-4 mt-4 max-w-md mx-auto">
-          <span className="block font-semibold text-foreground/70 text-sm mb-3">이온 모형</span>
-          <div className="flex gap-2 justify-center">
-            <Button
-              onClick={() => setIonDisplayMode('all')}
-              variant={ionDisplayMode === 'all' ? 'default' : 'outline'}
-              size="sm"
-              className={ionDisplayMode === 'all' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
-            >
-              전체 이온
-            </Button>
-            <Button
-              onClick={() => setIonDisplayMode('net')}
-              variant={ionDisplayMode === 'net' ? 'default' : 'outline'}
-              size="sm"
-              className={ionDisplayMode === 'net' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
-            >
-              알짜 이온
-            </Button>
-            <Button
-              onClick={() => setIonDisplayMode('spectator')}
-              variant={ionDisplayMode === 'spectator' ? 'default' : 'outline'}
-              size="sm"
-              className={ionDisplayMode === 'spectator' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
-            >
-              구경꾼 이온
-            </Button>
-          </div>
-        </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -208,7 +178,27 @@ export default function NeutralizationSimulator() {
         <div className="flex flex-col gap-8">
           {/* Simulation Area */}
           <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
-            <div className="flex justify-center items-end gap-12 md:gap-20 w-full h-[280px] mb-6">
+            {/* Ion Display Mode - small buttons */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xs font-semibold text-muted-foreground">이온 모형:</span>
+              <div className="flex gap-1">
+                {(['all', 'net', 'spectator'] as IonDisplayMode[]).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => setIonDisplayMode(mode)}
+                    className={`px-2 py-0.5 text-xs rounded-md border transition-colors ${
+                      ionDisplayMode === mode
+                        ? 'bg-foreground/80 text-background border-foreground/80'
+                        : 'bg-background/50 text-muted-foreground border-border hover:bg-muted'
+                    }`}
+                  >
+                    {mode === 'all' ? '전체' : mode === 'net' ? '알짜' : '구경꾼'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-center items-end gap-12 md:gap-20 w-full h-[260px] mb-4">
               <Beaker 
                 addedBaseVolume={addedBaseVolume} 
                 state={state} 
