@@ -5,6 +5,7 @@ import StateInfo from './StateInfo';
 import TemperatureChart from './TemperatureChart';
 import IonChart from './IonChart';
 import { CONSTANTS, calculateIonCounts, calculateSolutionState, calculateTemperature, calculateNeutralizationPoint, ACIDS_DATA, BASES_DATA } from '@/lib/neutralizationCalculations';
+import IonCountTable from './IonCountTable';
 import { ChartDataPoint, IndicatorType, AcidType, BaseType, IonDisplayMode } from '@/types/neutralization';
 import { FlaskConical, RotateCcw } from 'lucide-react';
 
@@ -259,7 +260,7 @@ export default function NeutralizationSimulator() {
 
         {/* Right Section - Charts */}
         <div className="flex flex-col gap-8">
-          <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
+          <div className="glass-panel p-6 rounded-xl flex flex-col">
             <h2 className="text-xl font-bold mb-4 text-primary border-b-2 border-primary/20 pb-2">
               이온 수 변화 그래프
             </h2>
@@ -272,6 +273,9 @@ export default function NeutralizationSimulator() {
                 acidType={acidType}
                 baseType={baseType}
               />
+            </div>
+            <div className="mt-4">
+              <IonCountTable ionCounts={ionCounts} acidType={acidType} baseType={baseType} />
             </div>
           </div>
 
