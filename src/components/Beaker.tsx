@@ -35,9 +35,9 @@ export default function Beaker({ addedBaseVolume, state, ionCounts, isAdding, in
   }, [isAdding]);
 
   return (
-    <div className="relative w-40 h-full">
-      {/* Burette */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 flex flex-col items-center z-10" style={{ height: '80px' }}>
+    <div className="relative w-40 flex flex-col items-center h-full">
+      {/* Burette - positioned above beaker */}
+      <div className="relative w-10 flex flex-col items-center z-10" style={{ height: '80px', marginBottom: '12px' }}>
         <div className="w-5 h-full bg-gray-300/50 border-x-2 border-t-2 border-gray-400 relative rounded-t-sm shadow-inner">
           <div 
             className="absolute bottom-0 w-full bg-gradient-to-b from-sky-400 to-sky-600 transition-all duration-300"
@@ -57,14 +57,13 @@ export default function Beaker({ addedBaseVolume, state, ionCounts, isAdding, in
         </div>
       </div>
 
-      {/* Beaker */}
-      <div className="absolute bottom-0 left-0 w-40 h-48 bg-gradient-to-b from-gray-200/30 to-gray-300/50 border-b-4 border-x-4 border-gray-400 rounded-b-3xl flex items-end shadow-xl">
+      {/* Beaker - below burette */}
+      <div className="relative w-40 h-48 bg-gradient-to-b from-gray-200/30 to-gray-300/50 border-b-4 border-x-4 border-gray-400 rounded-b-3xl flex items-end shadow-xl">
         <div 
           className={`w-full transition-all duration-500 ease-in-out rounded-b-2xl relative ${solutionColors.solution}`}
           style={{ height: `${Math.min(100, beakerFillHeight)}%` }}
         >
           <IonDisplay ionCounts={ionCounts} acidType={acidType} baseType={baseType} ionDisplayMode={ionDisplayMode} />
-          {/* Liquid shine effect */}
           <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent rounded-t-2xl" />
         </div>
         
