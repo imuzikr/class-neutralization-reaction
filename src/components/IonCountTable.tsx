@@ -10,46 +10,37 @@ export default function IonCountTable({ ionCounts, acidType, baseType }: IonCoun
   const acid = ACIDS[acidType];
   const base = BASES[baseType];
 
-  const rows = [
-    { label: acid.cation, value: ionCounts.h, className: 'text-yellow-600' },
-    { label: base.anion, value: ionCounts.oh, className: 'text-blue-600' },
-    { label: base.cation, value: ionCounts.baseCation, className: 'text-muted-foreground' },
-    { label: acid.anion, value: ionCounts.acidAnion, className: 'text-muted-foreground/70' },
-    { label: 'H₂O', value: ionCounts.water, className: 'text-teal-600' },
+  const items = [
+    { label: acid.cation, value: ionCounts.h, color: 'bg-yellow-500' },
+    { label: base.anion, value: ionCounts.oh, color: 'bg-blue-500' },
+    { label: base.cation, value: ionCounts.baseCation, color: 'bg-muted-foreground/60' },
+    { label: acid.anion, value: ionCounts.acidAnion, color: 'bg-muted-foreground/40' },
   ];
+
+  const maxVal = Math.max(...items.map(i => i.value), 1);
 
   return (
     <div className="w-full">
-      <h3 className="text-sm font-bold text-primary mb-2">현재 이온 수 (상대값)</h3>
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr className="border-b border-border">
-            <th className="text-left py-1.5 px-2 text-muted-foreground font-semibold">이온</th>
-            <th className="text-right py-1.5 px-2 text-muted-foreground font-semibold">개수</th>
-            <th className="text-left py-1.5 px-3 text-muted-foreground font-semibold w-1/2">비율</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(({ label, value, className }) => {
-            const maxVal = Math.max(ionCounts.h, ionCounts.oh, ionCounts.baseCation, ionCounts.acidAnion, ionCounts.water, 1);
-            const pct = (value / maxVal) * 100;
-            return (
-              <tr key={label} className="border-b border-border/50">
-                <td className={`py-1.5 px-2 font-semibold ${className}`}>{label}</td>
-                <td className="text-right py-1.5 px-2 font-mono">{value}</td>
-                <td className="py-1.5 px-3">
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full bg-primary/60 transition-all duration-500"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <h3 className="text-sm font-bold text-primary mb-3">현재 이온 수 (상대값)</h3>
+      <div className="grid grid-cols-2 gap-3">
+        {items.map(({ label, value, color }) => {
+          const pct = (value / maxVal) * 100;
+          return (
+            <div key={label} className="flex flex-col gap-1 bg-background/40 rounded-lg p-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground/80">{label}</span>
+                <span className="text-lg font-bold font-mono text-foreground">{value}</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-1.5">
+                <div
+                  className={`h-1.5 rounded-full ${color} transition-all duration-500`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
