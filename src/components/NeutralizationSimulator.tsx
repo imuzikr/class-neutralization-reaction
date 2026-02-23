@@ -99,16 +99,17 @@ export default function NeutralizationSimulator() {
           {acidInfo.name}({acidInfo.formula})에 {baseInfo.name}({baseInfo.formula})을 첨가하며 지시약의 색 변화를 관찰해 봅시다.
         </p>
         
-        {/* Acid/Base Selection */}
-        <div className="flex flex-wrap items-center justify-center gap-6 mt-4">
-          <div className="flex items-center gap-3">
-            <span className="font-semibold text-gray-700">산 선택:</span>
-            <div className="flex gap-2">
+        {/* Selection Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          {/* Acid Selection Card */}
+          <div className="glass-panel rounded-xl p-4">
+            <span className="block font-semibold text-foreground/70 text-sm mb-3">산 선택</span>
+            <div className="flex gap-2 justify-center">
               <Button
                 onClick={() => handleAcidChange('hcl')}
                 variant={acidType === 'hcl' ? 'default' : 'outline'}
                 size="sm"
-                className={acidType === 'hcl' ? 'bg-gradient-to-r from-red-400 to-red-500 text-white' : ''}
+                className={acidType === 'hcl' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
               >
                 HCl (1가)
               </Button>
@@ -116,21 +117,22 @@ export default function NeutralizationSimulator() {
                 onClick={() => handleAcidChange('h2so4')}
                 variant={acidType === 'h2so4' ? 'default' : 'outline'}
                 size="sm"
-                className={acidType === 'h2so4' ? 'bg-gradient-to-r from-red-400 to-red-500 text-white' : ''}
+                className={acidType === 'h2so4' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
               >
                 H₂SO₄ (2가)
               </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="font-semibold text-gray-700">염기 선택:</span>
-            <div className="flex gap-2">
+          {/* Base Selection Card */}
+          <div className="glass-panel rounded-xl p-4">
+            <span className="block font-semibold text-foreground/70 text-sm mb-3">염기 선택</span>
+            <div className="flex gap-2 justify-center">
               <Button
                 onClick={() => handleBaseChange('naoh')}
                 variant={baseType === 'naoh' ? 'default' : 'outline'}
                 size="sm"
-                className={baseType === 'naoh' ? 'bg-gradient-to-r from-blue-400 to-blue-500 text-white' : ''}
+                className={baseType === 'naoh' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
               >
                 NaOH (1가)
               </Button>
@@ -138,44 +140,46 @@ export default function NeutralizationSimulator() {
                 onClick={() => handleBaseChange('caoh2')}
                 variant={baseType === 'caoh2' ? 'default' : 'outline'}
                 size="sm"
-                className={baseType === 'caoh2' ? 'bg-gradient-to-r from-blue-400 to-blue-500 text-white' : ''}
+                className={baseType === 'caoh2' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
               >
                 Ca(OH)₂ (2가)
               </Button>
             </div>
           </div>
-        </div>
 
-        {/* Indicator Selection */}
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <span className="font-semibold text-gray-700">지시약 선택:</span>
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setIndicator('btb')}
-              variant={indicator === 'btb' ? 'default' : 'outline'}
-              className={indicator === 'btb' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' : ''}
-            >
-              BTB 용액
-            </Button>
-            <Button
-              onClick={() => setIndicator('phenolphthalein')}
-              variant={indicator === 'phenolphthalein' ? 'default' : 'outline'}
-              className={indicator === 'phenolphthalein' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white' : ''}
-            >
-              페놀프탈레인 용액
-            </Button>
+          {/* Indicator Selection Card */}
+          <div className="glass-panel rounded-xl p-4">
+            <span className="block font-semibold text-foreground/70 text-sm mb-3">지시약 선택</span>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onClick={() => setIndicator('btb')}
+                variant={indicator === 'btb' ? 'default' : 'outline'}
+                size="sm"
+                className={indicator === 'btb' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
+              >
+                BTB 용액
+              </Button>
+              <Button
+                onClick={() => setIndicator('phenolphthalein')}
+                variant={indicator === 'phenolphthalein' ? 'default' : 'outline'}
+                size="sm"
+                className={indicator === 'phenolphthalein' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
+              >
+                페놀프탈레인
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Ion Display Mode Selection */}
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <span className="font-semibold text-gray-700">이온 모형:</span>
-          <div className="flex gap-2">
+        {/* Ion Display Mode */}
+        <div className="glass-panel rounded-xl p-4 mt-4 max-w-md mx-auto">
+          <span className="block font-semibold text-foreground/70 text-sm mb-3">이온 모형</span>
+          <div className="flex gap-2 justify-center">
             <Button
               onClick={() => setIonDisplayMode('all')}
               variant={ionDisplayMode === 'all' ? 'default' : 'outline'}
               size="sm"
-              className={ionDisplayMode === 'all' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : ''}
+              className={ionDisplayMode === 'all' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
             >
               전체 이온
             </Button>
@@ -183,7 +187,7 @@ export default function NeutralizationSimulator() {
               onClick={() => setIonDisplayMode('net')}
               variant={ionDisplayMode === 'net' ? 'default' : 'outline'}
               size="sm"
-              className={ionDisplayMode === 'net' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : ''}
+              className={ionDisplayMode === 'net' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
             >
               알짜 이온
             </Button>
@@ -191,7 +195,7 @@ export default function NeutralizationSimulator() {
               onClick={() => setIonDisplayMode('spectator')}
               variant={ionDisplayMode === 'spectator' ? 'default' : 'outline'}
               size="sm"
-              className={ionDisplayMode === 'spectator' ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : ''}
+              className={ionDisplayMode === 'spectator' ? 'bg-foreground/80 hover:bg-foreground/70 text-background' : ''}
             >
               구경꾼 이온
             </Button>
