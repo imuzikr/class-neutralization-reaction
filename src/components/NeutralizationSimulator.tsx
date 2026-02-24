@@ -174,11 +174,11 @@ export default function NeutralizationSimulator() {
 
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
         {/* Left Section */}
         <div className="flex flex-col gap-8">
           {/* Simulation Area */}
-          <div className="glass-panel p-6 rounded-xl h-[480px] flex flex-col">
+          <div className="glass-panel p-6 rounded-xl flex-1 flex flex-col">
             {/* Ion Display Mode - small buttons */}
             <div className="flex items-center gap-2 mb-3 justify-end">
               <span className="text-xs font-semibold text-muted-foreground">이온 모형:</span>
@@ -260,7 +260,7 @@ export default function NeutralizationSimulator() {
 
         {/* Right Section - Charts */}
         <div className="flex flex-col gap-8">
-          <div className="glass-panel p-6 rounded-xl flex flex-col">
+          <div className="glass-panel p-6 rounded-xl flex-1 flex flex-col">
             <h2 className="text-xl font-bold mb-4 text-primary border-b-2 border-primary/20 pb-2">
               이온 수 변화 그래프
             </h2>
