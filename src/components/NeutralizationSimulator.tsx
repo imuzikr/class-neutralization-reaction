@@ -242,7 +242,7 @@ export default function NeutralizationSimulator() {
                 <span className="text-gray-600 ml-1">mL</span>
               </div>
               <div className="text-xs text-muted-foreground">
-                중화점: {neutralizationPoint}mL
+                중화점: {Math.round(neutralizationPoint)}mL
               </div>
             </div>
           </div>
